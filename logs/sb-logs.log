@@ -1,0 +1,36 @@
+2021-10-05 11:56:04.049  INFO 26304 --- [main] c.i.collegeapp.CollegeappApplication     : Starting CollegeappApplication using Java 11.0.12 on DESKTOP-F9HK18R with PID 26304 (C:\Users\Admin\IdeaProjects\collegeapp\target\classes started by Admin in C:\Users\Admin\IdeaProjects\collegeapp)
+2021-10-05 11:56:04.055  INFO 26304 --- [main] c.i.collegeapp.CollegeappApplication     : No active profile set, falling back to default profiles: default
+2021-10-05 11:56:04.722  INFO 26304 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2021-10-05 11:56:04.729  INFO 26304 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-10-05 11:56:04.729  INFO 26304 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
+2021-10-05 11:56:04.795  INFO 26304 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2021-10-05 11:56:04.796  INFO 26304 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 702 ms
+2021-10-05 11:56:05.180  INFO 26304 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path '/api'
+2021-10-05 11:56:05.187  INFO 26304 --- [main] c.i.collegeapp.CollegeappApplication     : Started CollegeappApplication in 1.438 seconds (JVM running for 1.712)
+2021-10-05 11:56:41.797  INFO 26304 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-10-05 11:56:41.797  INFO 26304 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2021-10-05 11:56:41.798  INFO 26304 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2021-10-05 12:46:07.823  INFO 28800 --- [main] c.i.collegeapp.CollegeappApplication     : Starting CollegeappApplication using Java 11.0.12 on DESKTOP-F9HK18R with PID 28800 (C:\Users\Admin\IdeaProjects\collegeapp\target\classes started by Admin in C:\Users\Admin\IdeaProjects\collegeapp)
+2021-10-05 12:46:07.825  INFO 28800 --- [main] c.i.collegeapp.CollegeappApplication     : No active profile set, falling back to default profiles: default
+2021-10-05 12:46:08.514  INFO 28800 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2021-10-05 12:46:08.521  INFO 28800 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-10-05 12:46:08.521  INFO 28800 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
+2021-10-05 12:46:08.572  INFO 28800 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2021-10-05 12:46:08.572  INFO 28800 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 710 ms
+2021-10-05 12:46:08.845  INFO 28800 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path '/api'
+2021-10-05 12:46:08.852  INFO 28800 --- [main] c.i.collegeapp.CollegeappApplication     : Started CollegeappApplication in 1.325 seconds (JVM running for 1.583)
+2021-10-05 12:52:08.974  INFO 28800 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-10-05 12:52:08.975  INFO 28800 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2021-10-05 12:52:08.976  INFO 28800 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2021-10-05 12:54:38.047  INFO 28584 --- [main] c.i.collegeapp.CollegeappApplication     : Starting CollegeappApplication using Java 11.0.12 on DESKTOP-F9HK18R with PID 28584 (C:\Users\Admin\IdeaProjects\collegeapp\target\classes started by Admin in C:\Users\Admin\IdeaProjects\collegeapp)
+2021-10-05 12:54:38.049  INFO 28584 --- [main] c.i.collegeapp.CollegeappApplication     : No active profile set, falling back to default profiles: default
+2021-10-05 12:54:38.738  INFO 28584 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2021-10-05 12:54:38.745  INFO 28584 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-10-05 12:54:38.746  INFO 28584 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
+2021-10-05 12:54:38.795  INFO 28584 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2021-10-05 12:54:38.795  INFO 28584 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 708 ms
+2021-10-05 12:54:39.067  INFO 28584 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path '/api'
+2021-10-05 12:54:39.074  INFO 28584 --- [main] c.i.collegeapp.CollegeappApplication     : Started CollegeappApplication in 1.321 seconds (JVM running for 1.587)
+2021-10-05 12:54:47.268  INFO 28584 --- [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-10-05 12:54:47.268  INFO 28584 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2021-10-05 12:54:47.269  INFO 28584 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
