@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <style>
+        table td{border-bottom:1px solid #ccc;padding:4px;margin:0}
+    </style>
+    <title>Fill Text JQuery</title>
+</head>
+<body>
+
+
+<div>
+    <!--    <form>-->
+    <!--        <label for="num_rec">Number of records:</label>-->
+    <!--        <input type="text" id="num_rec"><br>-->
+    <!--        <input type="button" value="Update" onclick="update_data()">-->
+    <!--    </form>-->
+    <table id="records" cellspacing="0">
+        <tr>
+            <td>First Name</td>
+            <td>Last Name</td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    function update_data() {
+        // const record_count = parseInt(document.getElementById("num_rec").value);
+        const url = "http://3.21.225.172:8080/api/";
+
+        $.getJSON( url + "realestate/all")
+            .done(function( data ) {
+                $.each( data, function( i, item ) {
+                    var html =
+                        "<td>" + item.fname + "</td>" +
+                        "<td>" + item.lname + "</td>" +
+                        "<td>" + item.yrblt + "</td>" +
+                        "<td>" + item.isnew + "</td>" +
+                        "<td>" + item.sqft  + "</td>" +
+                        "<td>" + item.baths + "</td>" +
+                        "<td>" + item.beds  + "</td>" +
+                        "<td>" + item.street + "</td>" +
+                        "<td>" + item.city  + "</td>" +
+                        "<td>" + item.state + "</td>" +
+                        "<td>" + item.zip + "</td>" +
+                        "<td>" + item.listing + "</td>" +
+                        "<td><img width=100 height=100 src='" + url + item.imageurl + "'/></td>";
+                    $("<tr/>").html(html).appendTo("#records");
+                });
+            });
+    }
+
+    update_data();
+</script>
+
+</body>
+
+</html>

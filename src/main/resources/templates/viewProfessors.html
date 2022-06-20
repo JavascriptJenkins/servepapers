@@ -1,0 +1,55 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>ViewProfessors</title>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<h1>This is the page where you see all the professors</h1>-->
+<!--<p>My first paragraph.</p>-->
+
+<!--<table>-->
+<!--    <tr th:each="professor : ${professors}">-->
+<!--        <td th:text="${professor.professor_id}"></td>-->
+<!--        <td th:text="${professor.professor_name}"></td>-->
+<!--        <td th:text="${professor.hire_date}"></td>-->
+<!--    </tr>-->
+<!--</table>-->
+
+
+<!--</body>-->
+<!--<div class="container">-->
+<!--    <h1>This is where edit a professor's data.</h1>-->
+
+<!--</div>-->
+
+<!--&lt;!&ndash; This table is to view the list of professors in the database &ndash;&gt;-->
+<!--&lt;!&ndash;CREATE TABLE professor ( professor_id INT NOT NULL,&ndash;&gt;-->
+<!--&lt;!&ndash;professor_name VARCHAR(225),&ndash;&gt;-->
+<!--&lt;!&ndash;hire_date DATE ,&ndash;&gt;-->
+<!--&lt;!&ndash;has_phd INT,&ndash;&gt;-->
+<!--&lt;!&ndash;PRIMARY KEY  (professor_id))&ndash;&gt;-->
+<!--<div class="container">-->
+<!--    <table class="table">-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--            <th scope="col">#</th>-->
+<!--            <th scope="col">Professor Name</th>-->
+<!--            <th scope="col">Hire Date </th>-->
+<!--            <th scope="col">Has Phd</th>-->
+
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        <tr th:each="professor : ${professors}">-->
+<!--            <td th:text="${professor.professor_id}"></td>-->
+<!--            <td onclick="makeInput($(this).closest('tr'), this)" th:text="${professor.professor_name}"></td>-->
+<!--            <td onclick="makeInput($(this).closest('tr'), this)" th:text="${professor.hire_date}"></td>-->
+<!--            <td onclick="makeInput($(this).closest('tr'), this)" th:text="${professor.has_phd}"></td>-->
+<!--            <td th:text="${professor.professor_id_number}"></td>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--</div>-->
+
+<!--</html>-->
