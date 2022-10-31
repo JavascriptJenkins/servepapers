@@ -28,13 +28,20 @@ public class LoginFilter extends OncePerRequestFilter {
 
         String credentials = httpServletRequest.getHeader("Authorization");
 
-        if(credentials == null || credentials.isEmpty()){
+        if(credentials == null
+                || credentials.isEmpty()
+        ){
             // this means we have no authorization, which means nobody has logged in yet
-            System.out.println("credentials are null. ");
+            System.out.println("credentials are null. redirect to auth page");
+            httpServletResponse.sendRedirect ("auth"); // redirect to the auth page is there are no credentials to parse
         } else {
 
-            // check the database to see if the passed in credentials are legitimate
-           // StudentDAO studentDAO = studentJpaRepo.findByStudent_NameAndStudent_ID_Number();
+            // check to make sure the authorization header is in the valid format (length check)
+
+
+            // use secret key to decrypt username/password
+
+            // check against the cache to update roles (make a cache/cache update service)
 
 
         }

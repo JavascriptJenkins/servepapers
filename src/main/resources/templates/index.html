@@ -40,84 +40,84 @@
 <div class="container">
 
 
-    <form th:action="@{/vote}" th:object="${canceltrain}" method="post">
-        <div class="page-content page-container" id="page-content">
-        <div class="padding">
-            <div class="row container d-flex justify-content-center">
-                <div class="col-md-8">
-                    <div class="box">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">Welcome aboard the cancel train!</h3>
-                        </div> <!-- /.box-header -->
-                        <div class="box-body">
-                            <table class="table table-bordered">
-                                <tbody>
-                                <tr>
-                                    <th style="width: 10px">#</th>
-                                    <th>Name</th>
-                                    <th>Cancel Status</th>
-                                    <th style="width: 100px">Upvote</th>
-                                    <th style="width: 60px">Downvote</th>
-                                </tr>
-                                <tr th:each="canceltrain : ${canceltrains}">
-                                    <td th:text="${canceltrain.id}"></td>
-                                    <td th:text="${canceltrain.fname}+ ${canceltrain.lname}"></td>
-                                    <td>
-                                        <div class="progress progress-xs">
+<!--    <form th:action="@{/vote}" th:object="${canceltrain}" method="post">-->
+<!--        <div class="page-content page-container" id="page-content">-->
+<!--        <div class="padding">-->
+<!--            <div class="row container d-flex justify-content-center">-->
+<!--                <div class="col-md-8">-->
+<!--                    <div class="box">-->
+<!--                        <div class="box-header with-border">-->
+<!--                            <h3 class="box-title">Welcome aboard the cancel train!</h3>-->
+<!--                        </div> &lt;!&ndash; /.box-header &ndash;&gt;-->
+<!--                        <div class="box-body">-->
+<!--                            <table class="table table-bordered">-->
+<!--                                <tbody>-->
+<!--                                <tr>-->
+<!--                                    <th style="width: 10px">#</th>-->
+<!--                                    <th>Name</th>-->
+<!--                                    <th>Cancel Status</th>-->
+<!--                                    <th style="width: 100px">Upvote</th>-->
+<!--                                    <th style="width: 60px">Downvote</th>-->
+<!--                                </tr>-->
+<!--                                <tr th:each="canceltrain : ${canceltrains}">-->
+<!--                                    <td th:text="${canceltrain.id}"></td>-->
+<!--                                    <td th:text="${canceltrain.fname}+ ${canceltrain.lname}"></td>-->
+<!--                                    <td>-->
+<!--                                        <div class="progress progress-xs">-->
 
-                                            <div class="progress-bar progress-bar-danger" th:style="'width:'+@{${canceltrain.progressbar}}+'%;'"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span th:text="${canceltrain.upvotes} "></span>
-                                        <button th:attr="onclick=|vote(1,'${canceltrain.id}')|" type="submit" class="invisiblebutton">
-                                            <i class="btn btn-light bi-arrow-up-circle" href="#"></i>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <span  th:text="${canceltrain.downvotes} "></span>
-                                        <button th:attr="onclick=|vote(0,'${canceltrain.id}')|" type="submit" class="invisiblebutton">
-                                            <i  class="btn btn-light bi-arrow-down-circle" href="#"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+<!--                                            <div class="progress-bar progress-bar-danger" th:style="'width:'+@{${canceltrain.progressbar}}+'%;'"></div>-->
+<!--                                        </div>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <span th:text="${canceltrain.upvotes} "></span>-->
+<!--                                        <button th:attr="onclick=|vote(1,'${canceltrain.id}')|" type="submit" class="invisiblebutton">-->
+<!--                                            <i class="btn btn-light bi-arrow-up-circle" href="#"></i>-->
+<!--                                        </button>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <span  th:text="${canceltrain.downvotes} "></span>-->
+<!--                                        <button th:attr="onclick=|vote(0,'${canceltrain.id}')|" type="submit" class="invisiblebutton">-->
+<!--                                            <i  class="btn btn-light bi-arrow-down-circle" href="#"></i>-->
+<!--                                        </button>-->
+<!--                                    </td>-->
+<!--                                </tr>-->
 
-                                </tbody>
-                            </table>
-                        </div>
-
-
+<!--                                </tbody>-->
+<!--                            </table>-->
+<!--                        </div>-->
 
 
 
-                        <!-- /.box-body -->
-                        <!--                        <div class="box-footer clearfix">-->
-                        <!--                            <ul class="pagination pagination-sm no-margin pull-right">-->
-                        <!--                                <li><a href="#" data-abc="true">«</a></li>-->
-                        <!--                                <li><a href="#" data-abc="true">1</a></li>-->
-                        <!--                                <li><a href="#" data-abc="true">2</a></li>-->
-                        <!--                                <li><a href="#" data-abc="true">3</a></li>-->
-                        <!--                                <li><a href="#" data-abc="true">»</a></li>-->
-                        <!--                            </ul>-->
-                        <!--                        </div>-->
-                    </div>
-                </div>
-            </div>
-
-            <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
-
-            <label for="token" class="form-label">Vote Token</label>
-            <input th:field="*{token}" type="text" class="form-control" id="token">
-            <div id="tokenHelp" class="form-text">Paste token here (Request a token first)</div>
 
 
-        </div>
-    </div>
+<!--                        &lt;!&ndash; /.box-body &ndash;&gt;-->
+<!--                        &lt;!&ndash;                        <div class="box-footer clearfix">&ndash;&gt;-->
+<!--                        &lt;!&ndash;                            <ul class="pagination pagination-sm no-margin pull-right">&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                <li><a href="#" data-abc="true">«</a></li>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                <li><a href="#" data-abc="true">1</a></li>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                <li><a href="#" data-abc="true">2</a></li>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                <li><a href="#" data-abc="true">3</a></li>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                <li><a href="#" data-abc="true">»</a></li>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                            </ul>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 
-    <input id="voteInput" style="display: none;" type="text" th:field="*{incomingVote}" >
-    <input id="voteInputID" style="display: none;" type="text" th:field="*{id}" >
+<!--            <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>-->
 
-    </form>
+<!--            <label for="token" class="form-label">Vote Token</label>-->
+<!--            <input th:field="*{token}" type="text" class="form-control" id="token">-->
+<!--            <div id="tokenHelp" class="form-text">Paste token here (Request a token first)</div>-->
+
+
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <input id="voteInput" style="display: none;" type="text" th:field="*{incomingVote}" >-->
+<!--    <input id="voteInputID" style="display: none;" type="text" th:field="*{id}" >-->
+
+<!--    </form>-->
 
 
 

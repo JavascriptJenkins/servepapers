@@ -1,12 +1,16 @@
 package com.isaac.collegeapp.runlistener;
 
+import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.model.ProfessorDAO;
+import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.repo.ProfessorRepository;
+import com.isaac.collegeapp.util.SimpleCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -15,9 +19,18 @@ public class GlobalRunListener implements ApplicationListener<ApplicationReadyEv
     @Autowired
     ProfessorRepository professorRepository;
 
+    @Autowired
+    SystemUserRepo systemUserRepo;
+
+    @Autowired
+    SimpleCache simpleCache;
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        System.out.println("Application has started, executing code now");
+        System.out.println("----- TechVVS Application has started ----");
+        System.out.println("------- TechVVS Custom Cache Init ------");
+
+        simpleCache.refreshCache();
         //loadDatabaseConnection();
         //getProfessors();
     }

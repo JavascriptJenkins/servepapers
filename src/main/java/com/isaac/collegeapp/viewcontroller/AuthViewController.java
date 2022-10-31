@@ -1,23 +1,25 @@
 package com.isaac.collegeapp.viewcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.isaac.collegeapp.constants.StaticRoles;
 import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.h2model.CancelTrainVO;
 import com.isaac.collegeapp.h2model.TokenVO;
 import com.isaac.collegeapp.jparepo.CancelTrainRepo;
+import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.StudentDAO;
+import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.service.StudentService;
 import com.isaac.collegeapp.util.ControllerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -26,11 +28,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
-@RequestMapping("/notused")
+@RequestMapping("/auth")
 @Controller
-public class CancelTrainViewController {
+public class AuthViewController {
 
     @Autowired
     StudentService studentService;
@@ -47,6 +47,12 @@ public class CancelTrainViewController {
     CancelTrainRepo cancelTrainRepo;
 
     @Autowired
+    SystemUserRepo systemUserRepo;
+
+    @Autowired
+    StaticRoles staticRoles;
+
+    @Autowired
     TokenRepo tokenRepo;
 
     SecureRandom secureRandom = new SecureRandom();
@@ -57,22 +63,216 @@ public class CancelTrainViewController {
 
     //default home mapping
     @GetMapping
-    String viewHomePage(Model model){
+    String viewAuthPage(Model model){
 
 
-        List<CancelTrainVO> cancelTrainVOList = calculateProgressBars();
+        //List<CancelTrainVO> cancelTrainVOList = calculateProgressBars();
 
 //        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-        model.addAttribute("canceltrains", cancelTrainVOList);
-        model.addAttribute("canceltrain", new CancelTrainVO());
+//        model.addAttribute("canceltrains", cancelTrainVOList);
+//        model.addAttribute("canceltrain", new CancelTrainVO());
 
 //        model.addAttribute("canceltrainNewCancel", new CancelTrainVO());
 
 
 
 //        model.addAttribute("students", studentService.getAllStudentData());
-        return "index.html";
+        return "auth.html";
     }
+
+    @GetMapping("/verify")
+    String viewAuthVerify(@RequestParam("token") String token, Model model){
+
+
+        TokenVO tokenVO = tokenRepo.findByToken(token);
+
+
+        if(checkTokenExpire(tokenVO.getCreatetimestamp()) == 1){
+            // if token is expired tell user to request another
+            return "authRequestNewToken.html";
+        }
+
+
+        SystemUserDAO systemUserDAO = systemUserRepo.findByEmail(tokenVO.getEmail());
+
+
+
+
+        if(tokenVO != null && tokenVO.getEmail() != null
+                && systemUserDAO != null
+                && tokenVO.getTokenused() == 0
+
+        ){
+
+            // update system user object
+            systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
+            systemUserDAO.setIsuseractive(1);
+            systemUserDAO.setRoles(staticRoles.getREAD()+staticRoles.getWRITE()); // add write access
+
+            try{
+                systemUserRepo.save(systemUserDAO);
+            } catch (Exception ex){
+                model.addAttribute("errorMessage", "System Error.  Try again or contact support: support@techvvs.io");
+
+                System.out.println("Error in viewAuthVerify: "+ex.getMessage());
+                return "authVerifySuccess.html";
+            }
+
+            try{
+                tokenVO.setTokenused(1);
+                tokenVO.setUpdatedtimestamp(LocalDateTime.now());
+                tokenRepo.save(tokenVO);
+            } catch (Exception ex){
+                model.addAttribute("errorMessage", "System Error.  Try again or contact support: support@techvvs.io");
+
+                System.out.println("Error in viewAuthVerify: "+ex.getMessage());
+                return "authVerifySuccess.html";
+            }
+
+
+            // add data for page display
+            model.addAttribute("token", tokenVO.getEmail());
+            model.addAttribute("successMessage", "Success activating account with email: "+tokenVO.getEmail());
+        }
+        return "authVerifySuccess.html";
+    }
+
+    int checkTokenExpire(LocalDateTime tokencreated){
+
+        LocalDateTime oneHourFromTokenCreation = tokencreated.plusHours(1);
+        LocalDateTime now = LocalDateTime.now();
+
+        if(now.isAfter(oneHourFromTokenCreation)){
+            return 1; // this means one hour has passed and token is invalid
+        }
+
+        return 0;
+    }
+
+    @PostMapping ("/createSystemUser")
+    String createSystemUser(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model){
+
+        //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
+
+        String errorResult = validateCreateSystemUser(systemUserDAO);
+
+        // Validation on student name
+        if(!errorResult.equals("success")){
+            model.addAttribute("errorMessage",errorResult);
+        } else {
+            // This code block will execute if there are no errors in the data that was inputed by the client
+
+            // step 1) create the new student and attach the success message
+
+            // give the user read priveledges until account is activated
+            systemUserDAO.setRoles(staticRoles.getREAD());
+            systemUserDAO.setIsuseractive(0); // set this to 1 when email token is created
+            systemUserDAO.setCreatetimestamp(LocalDateTime.now());
+            systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
+
+            try{
+                systemUserRepo.save(systemUserDAO);
+
+                TokenVO tokenVO = new TokenVO();
+
+                tokenVO.setEmail(systemUserDAO.getEmail());
+                tokenVO.setTokenused(0);
+
+                // send user an email link to validate account
+                sendValidateEmailToken(tokenVO);
+
+            } catch(Exception ex){
+                model.addAttribute("errorMessage","System Error");
+                System.out.println("TechVVS System Error in createSystemUser: "+ex.getMessage());
+                return "newStudent.html"; // return early with error
+            }
+
+
+            model.addAttribute("successMessage","Check your email to activate account: "+systemUserDAO.getEmail());
+
+        }
+
+        return "newStudent.html";
+    }
+
+    String validateCreateSystemUser(SystemUserDAO systemUserDAO){
+        if(systemUserDAO.getUsername().length() > 100
+                || systemUserDAO.getUsername().length() < 6
+        ){
+            return "username must be between 6-100 characters and contain @ and .com";
+        }
+
+        if(systemUserDAO.getPhone().length() > 11
+                || systemUserDAO.getPhone().length() < 10
+                || systemUserDAO.getPhone().contains("-")
+                || systemUserDAO.getPhone().contains(".")
+        ){
+            return "enter 10 or 11 digit phone number with no spaces or symbols.  ex. 18884445555";
+        } else {
+            systemUserDAO.setPhone(systemUserDAO.getPhone().trim());
+            systemUserDAO.setPhone(systemUserDAO.getPhone().replaceAll(" ",""));
+        }
+
+        if(systemUserDAO.getEmail().length() < 6
+            || systemUserDAO.getEmail().length() > 200
+            || !systemUserDAO.getEmail().contains("@")
+            || !systemUserDAO.getEmail().contains(".com")
+
+        ){
+            return "email must be between 6-200 characters and contain @ and .com";
+        } else {
+            systemUserDAO.setEmail(systemUserDAO.getEmail().trim());
+            systemUserDAO.setEmail(systemUserDAO.getEmail().replaceAll(" ",""));
+        }
+
+
+        if( systemUserDAO.getPassword().length() > 200
+            || systemUserDAO.getPassword().length() < 10 ){
+            return "password must be between 10-200 characters";
+        }
+        return "success";
+    }
+
+    void sendValidateEmailToken(TokenVO tokenVO){
+
+
+
+        if(tokenVO.getEmail() != null &&
+                tokenVO.getEmail().contains("@")){
+
+
+            // todo: send cancel token
+            TokenVO newToken = new TokenVO();
+
+            //generate token and send email
+            newToken.setTokenused(0);
+            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
+            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
+            newToken.setToken(String.valueOf(secureRandom.nextInt(100000)));
+            newToken.setUpdatedtimestamp(LocalDateTime.now());
+            newToken.setCreatetimestamp(LocalDateTime.now());
+
+
+            //todo: send email before saving
+            try{
+                ArrayList<String> list = new ArrayList<String>(1);
+                list.add(newToken.getEmail());
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("Verify your new account at https://servepapers.techvvs.io/auth/verify&token="+newToken.getToken());
+
+                emailManager.generateAndSendEmail(sb.toString(), list, "Voting token from Cancel Train!");
+            } catch (Exception ex){
+                System.out.println("error sending email");
+
+            } finally{
+                tokenRepo.save(newToken);
+            }
+
+        }
+
+    }
+
 
     @GetMapping("/requestcancel")
     String requestcancel(Model model){
@@ -161,8 +361,8 @@ public class CancelTrainViewController {
             newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
             newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
             newToken.setToken(String.valueOf(secureRandom.nextInt(100000)));
-            newToken.setUpdatedtimestamp(java.time.LocalDateTime.now());
-            newToken.setCreatetimestamp(java.time.LocalDateTime.now());
+            newToken.setUpdatedtimestamp(LocalDateTime.now());
+            newToken.setCreatetimestamp(LocalDateTime.now());
 
 
             //todo: send email before saving
@@ -214,8 +414,8 @@ public class CancelTrainViewController {
             cancelTrainVO.setDownvotes(0);
             cancelTrainVO.setImageurl("");
             cancelTrainVO.setCancelstatus(0); // will be set to 1 to show in grid
-            cancelTrainVO.setUpdatedtimestamp(java.time.LocalDateTime.now());
-            cancelTrainVO.setCreatetimestamp(java.time.LocalDateTime.now());
+            cancelTrainVO.setUpdatedtimestamp(LocalDateTime.now());
+            cancelTrainVO.setCreatetimestamp(LocalDateTime.now());
 
             //todo:add validation so same people are not added twice on refresh or on purpose
             cancelTrainRepo.save(cancelTrainVO);
@@ -292,7 +492,7 @@ public class CancelTrainViewController {
         return "newStudent.html";
     }
 
-    @PostMapping ("/createStudent")
+    @PostMapping ("/createUser")
     String createStudent(@ModelAttribute( "student" ) StudentDAO studentDAO, Model model){
 
         controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
