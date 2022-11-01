@@ -4,8 +4,8 @@ package com.isaac.collegeapp.model;
 import javax.persistence.*;
 import java.sql.Date;
 
-@Entity
-@Table(name="student")
+//@Entity
+//@Table(name="student")
 public class StudentDAO {
 
     // These are your data attributes for the model object

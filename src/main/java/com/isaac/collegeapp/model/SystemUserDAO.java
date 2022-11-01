@@ -2,10 +2,12 @@ package com.isaac.collegeapp.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.isaac.collegeapp.security.Role;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name="systemuser")
@@ -16,9 +18,6 @@ public class SystemUserDAO {
     @Column(name="id")
     Integer id;
 
-    @Column(name="username")
-    String username;
-
     @Column(name="password")
     String password;
 
@@ -26,7 +25,9 @@ public class SystemUserDAO {
     String email;
 
     @Column(name="roles")
-    String roles;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    Role[] roles;
 
     @Column(name="phone")
     String phone;
@@ -55,11 +56,11 @@ public class SystemUserDAO {
         this.email = email;
     }
 
-    public String getRoles() {
+    public Role[] getRoles() {
         return roles;
     }
 
-    public void setRoles(String roles) {
+    public void setRoles(Role[] roles) {
         this.roles = roles;
     }
 
@@ -103,21 +104,6 @@ public class SystemUserDAO {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getusername() {
-        return username;
-    }
-
-    public void setusername(String username) {
-        this.username = username;
-    }
 
 
 

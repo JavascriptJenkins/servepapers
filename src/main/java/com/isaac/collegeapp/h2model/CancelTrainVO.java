@@ -7,9 +7,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Entity
-@Table(name="cancel_train")
-@JsonIgnoreProperties
+//@Entity
+//@Table(name="cancel_train")
+//@JsonIgnoreProperties
 public class CancelTrainVO {
 
     @Id

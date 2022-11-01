@@ -25,12 +25,16 @@ public class GlobalRunListener implements ApplicationListener<ApplicationReadyEv
     @Autowired
     SimpleCache simpleCache;
 
+
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
         System.out.println("----- TechVVS Application has started ----");
         System.out.println("------- TechVVS Custom Cache Init ------");
+        //System.out.println(passwordEncoder.encode("password"));
 
         simpleCache.refreshCache();
+
         //loadDatabaseConnection();
         //getProfessors();
     }

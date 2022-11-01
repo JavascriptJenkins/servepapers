@@ -25,14 +25,14 @@ public class SimpleCache {
     // making a cache of the users and their roles so we don't have to go to database every time
     public void refreshCache(){
 
-        List<SystemUserDAO> systemUsers = systemUserRepo.findAll();
-
-        HashMap<SystemUserDAO, String> usermap = new HashMap<>();
+//        List<SystemUserDAO> systemUsers = systemUserRepo.findAll();
+//
+//        HashMap<SystemUserDAO, String> usermap = new HashMap<>();
 
         // for each database row add it to the cache
-        for(SystemUserDAO systemUser : systemUsers){
-            usermap.put(systemUser, systemUser.getRoles()); // add the users and their roles to the map
-        }
+//        for(SystemUserDAO systemUser : systemUsers){
+//            usermap.put(systemUser, systemUser.getRoles()); // add the users and their roles to the map
+//        }
 
         setUserMapCache(usermap); // set the in-memory cache with values from database
     }

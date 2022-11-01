@@ -6,10 +6,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Login to the Servepapers TechVVS system.</h1>
+        <h1>Create a new account for the Servepapers TechVVS system.</h1>
 
         <!--@RequestMapping("/studentView")-->
-        <form th:action="@{/auth/createSystemUser}" th:object="${systemuser}" method="post">
+        <form th:action="@{/login/createSystemUser}" th:object="${systemuser}" method="post">
 
             <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
             <div class="alert alert-info" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
@@ -22,6 +22,10 @@
                 </div>
 
                 <div class="col">
+                    <input type="text" th:field="*{phone}" class="form-control" placeholder="Phone" aria-label="Phone">
+                </div>
+
+                <div class="col">
                     <input type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
                 </div>
 
@@ -31,15 +35,6 @@
             <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>
 
         </form>
-
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <a href="http://localhost:8080/login/createaccount">Click here to create an account</a>
-
-
     </div>
 
 

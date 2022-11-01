@@ -10,7 +10,6 @@ import java.util.List;
 public interface SystemUserRepo extends CrudRepository<SystemUserDAO, Long> {
 
         List<SystemUserDAO> findAll();
-        SystemUserDAO findByUsername(String username);
         SystemUserDAO findByEmail(String email);
         SystemUserDAO findById(Integer id);
 

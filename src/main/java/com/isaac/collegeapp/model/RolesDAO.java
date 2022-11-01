@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name="roles")
+//@Entity
+//@Table(name="roles")
 public class RolesDAO {
 
     @Id

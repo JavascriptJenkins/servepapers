@@ -5,46 +5,44 @@ import com.isaac.collegeapp.constants.StaticRoles;
 import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.h2model.CancelTrainVO;
 import com.isaac.collegeapp.h2model.TokenVO;
-import com.isaac.collegeapp.jparepo.CancelTrainRepo;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.StudentDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
+import com.isaac.collegeapp.security.Role;
+import com.isaac.collegeapp.security.Token;
+import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
-import com.isaac.collegeapp.util.ControllerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
-@RequestMapping("/auth")
+@RequestMapping("/login")
 @Controller
 public class AuthViewController {
 
     @Autowired
     StudentService studentService;
 
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    ControllerHelper controllerHelper;
+    UserService userService;
+
+    ObjectMapper mapper = new ObjectMapper();
+
+
 
     @Autowired
     HttpServletRequest httpServletRequest;
 
-    @Autowired
-    CancelTrainRepo cancelTrainRepo;
+
 
     @Autowired
     SystemUserRepo systemUserRepo;
@@ -65,19 +63,24 @@ public class AuthViewController {
     @GetMapping
     String viewAuthPage(Model model){
 
-
-        //List<CancelTrainVO> cancelTrainVOList = calculateProgressBars();
-
-//        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-//        model.addAttribute("canceltrains", cancelTrainVOList);
-//        model.addAttribute("canceltrain", new CancelTrainVO());
-
-//        model.addAttribute("canceltrainNewCancel", new CancelTrainVO());
-
-
-
-//        model.addAttribute("students", studentService.getAllStudentData());
+        model.addAttribute("systemuser", new SystemUserDAO());
         return "auth.html";
+    }
+
+    //error page displayed when nobody is logged in
+    @GetMapping("/error")
+    String showErrorPage(Model model){
+
+        model.addAttribute("systemuser", new SystemUserDAO());
+        return "error.html";
+    }
+
+    //error page displayed when nobody is logged in
+    @GetMapping("/createaccount")
+    String viewCreateAccount(Model model){
+
+        model.addAttribute("systemuser", new SystemUserDAO());
+        return "newaccount.html";
     }
 
     @GetMapping("/verify")
@@ -107,7 +110,10 @@ public class AuthViewController {
             // update system user object
             systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
             systemUserDAO.setIsuseractive(1);
-            systemUserDAO.setRoles(staticRoles.getREAD()+staticRoles.getWRITE()); // add write access
+           // systemUserDAO.setRoles(staticRoles.getREAD()+staticRoles.getWRITE()); // add write access
+            Role[] array = new Role[1];
+            array[0] = Role.ROLE_CLIENT;
+            systemUserDAO.setRoles(array); // add write access
 
             try{
                 systemUserRepo.save(systemUserDAO);
@@ -154,6 +160,17 @@ public class AuthViewController {
 
         //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
 
+        Role[] array = new Role[1];
+        array[0] = Role.ROLE_CLIENT;
+        systemUserDAO.setRoles(array); // add write access
+
+        systemUserDAO.setIsuseractive(0); // set this to 1 when email token is created
+       // systemUserDAO.setId(0);
+        systemUserDAO.setCreatetimestamp(LocalDateTime.now());
+        systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
+
+
+
         String errorResult = validateCreateSystemUser(systemUserDAO);
 
         // Validation on student name
@@ -165,10 +182,8 @@ public class AuthViewController {
             // step 1) create the new student and attach the success message
 
             // give the user read priveledges until account is activated
-            systemUserDAO.setRoles(staticRoles.getREAD());
-            systemUserDAO.setIsuseractive(0); // set this to 1 when email token is created
-            systemUserDAO.setCreatetimestamp(LocalDateTime.now());
-            systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
+            //systemUserDAO.setRoles(staticRoles.getREAD());
+
 
             try{
                 systemUserRepo.save(systemUserDAO);
@@ -184,7 +199,7 @@ public class AuthViewController {
             } catch(Exception ex){
                 model.addAttribute("errorMessage","System Error");
                 System.out.println("TechVVS System Error in createSystemUser: "+ex.getMessage());
-                return "newStudent.html"; // return early with error
+                return "newaccount.html"; // return early with error
             }
 
 
@@ -192,15 +207,69 @@ public class AuthViewController {
 
         }
 
-        return "newStudent.html";
+        return "newaccount.html";
+    }
+
+    @PostMapping ("/login")
+    String login(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model, HttpServletResponse response){
+
+        //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
+
+        String errorResult = validateCreateSystemUser(systemUserDAO);
+
+        // Validation
+        if(!errorResult.equals("success")){
+            model.addAttribute("errorMessage",errorResult);
+        } else {
+
+            try{
+                Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
+
+                if(existingUser.isPresent()){
+                    String token = userService.signin(
+                            systemUserDAO.getEmail(),
+                            systemUserDAO.getPassword());
+
+                    Token token1;
+                    if(token != null){
+//                            logger.info("SIGN-IN TOKEN GENERATED!!! ");
+                        System.out.println("SIGN-IN TOKEN GENERATED!!! ");
+                        token1 = new Token();
+                        token1.setToken(token);
+                        // return mapper.writeValueAsString(token1);
+
+
+
+                        // put this token in http response and it will be read by filter on
+                        // next requests (i think)
+
+
+                        response.setHeader("Authorization: Bearer", mapper.writeValueAsString(token1));
+                     //   return mapper.writeValueAsString(token1);
+
+
+
+                    } else {
+//                            logger.info("TOKEN IS NULL THIS IS BAD BRAH! ");
+                        System.out.println("TOKEN IS NULL THIS IS BAD BRAH! ");
+                    }
+                }
+
+            } catch(Exception ex){
+                model.addAttribute("errorMessage","System Error");
+                System.out.println("TechVVS System Error in login: "+ex.getMessage());
+                return "auth.html"; // return early with error
+            }
+
+
+            model.addAttribute("successMessage","You are logged in: "+systemUserDAO.getEmail());
+
+        }
+
+        return "index.html";
     }
 
     String validateCreateSystemUser(SystemUserDAO systemUserDAO){
-        if(systemUserDAO.getUsername().length() > 100
-                || systemUserDAO.getUsername().length() < 6
-        ){
-            return "username must be between 6-100 characters and contain @ and .com";
-        }
 
         if(systemUserDAO.getPhone().length() > 11
                 || systemUserDAO.getPhone().length() < 10
@@ -227,8 +296,8 @@ public class AuthViewController {
 
 
         if( systemUserDAO.getPassword().length() > 200
-            || systemUserDAO.getPassword().length() < 10 ){
-            return "password must be between 10-200 characters";
+            || systemUserDAO.getPassword().length() < 8 ){
+            return "password must be between 8-200 characters";
         }
         return "success";
     }
@@ -293,56 +362,11 @@ public class AuthViewController {
     }
 
 
-    @PostMapping("/vote")
-    String vote(@ModelAttribute( "canceltrain" ) CancelTrainVO cancelTrainVO, Model model){
-
-
-        //check to see if the token is valid and has not expired
-        TokenVO tokenVO = tokenRepo.findByToken(cancelTrainVO.getToken());
-        if(tokenVO != null
-        && (LocalDateTime.now().isBefore(tokenVO.getCreatetimestamp().plusHours(24))) // only allow tokens made within past 24 hours
-                && tokenVO.getTokenused() < 1 // only allow 1 votes per token
-        ){
-
-
-            if(cancelTrainVO.getIncomingVote() ==0){
-                Optional<CancelTrainVO> existing = cancelTrainRepo.findById(cancelTrainVO.getId());
-
-                existing.get().setDownvotes(existing.get().getDownvotes() - 1);
-                cancelTrainRepo.save(existing.get());
-
-            } else if(cancelTrainVO.getIncomingVote() ==1){
-                Optional<CancelTrainVO> existing = cancelTrainRepo.findById(cancelTrainVO.getId());
-                existing.get().setUpvotes(existing.get().getUpvotes() + 1);
-                cancelTrainRepo.save(existing.get());
-            }
-
-
-            // now we have to increment the token to isUsed == 1
-            tokenVO.setTokenused(1);
-            tokenRepo.save(tokenVO);
-        } else {
-            model.addAttribute("errorMessage", "Insert valid token below before voting. ");
-            model.addAttribute("canceltrain", new CancelTrainVO());
-            model.addAttribute("canceltrainNewCancel", new CancelTrainVO());
-
-            model.addAttribute("canceltrains",calculateProgressBars());
-
-            return "index.html";
-        }
 
 
 
 
 
-        model.addAttribute("canceltrain", new CancelTrainVO());
-        model.addAttribute("canceltrainNewCancel", new CancelTrainVO());
-
-        model.addAttribute("canceltrains",calculateProgressBars());
-
-
-        return "redirect:/";
-    }
 
 
     @PostMapping("/requesttoken")
@@ -399,148 +423,13 @@ public class AuthViewController {
         return "token.html";
     }
 
-    @PostMapping("/newCancel")
-    String newCancel(@ModelAttribute( "canceltrainNewCancel" ) CancelTrainVO cancelTrainVO, Model model){
-
-
-        if(cancelTrainVO.getFname() != null
-        && cancelTrainVO.getLname() != null
-        && cancelTrainVO.getWhy() != null
-
-        ){
-
-            cancelTrainVO.setId(null);
-            cancelTrainVO.setUpvotes(0);
-            cancelTrainVO.setDownvotes(0);
-            cancelTrainVO.setImageurl("");
-            cancelTrainVO.setCancelstatus(0); // will be set to 1 to show in grid
-            cancelTrainVO.setUpdatedtimestamp(LocalDateTime.now());
-            cancelTrainVO.setCreatetimestamp(LocalDateTime.now());
-
-            //todo:add validation so same people are not added twice on refresh or on purpose
-            cancelTrainRepo.save(cancelTrainVO);
-
-            //todo: add a link so people can be directed back home
-            model.addAttribute("successMessage", "Thank you for submitting a new cancel candidate!");
-
-            model.addAttribute("canceltrain", new CancelTrainVO());
-            model.addAttribute("canceltrainNewCancel", new CancelTrainVO());
-            model.addAttribute("canceltrains",cancelTrainRepo.findAll());
-
-        } else {
-            model.addAttribute("errorMessage", "Please fill out all data!");
-
-            model.addAttribute("canceltrain", new CancelTrainVO());
-            model.addAttribute("canceltrainNewCancel", new CancelTrainVO());
-            model.addAttribute("canceltrains",calculateProgressBars());
-
-        }
 
 
 
 
-        return "requestcancel.html";
-    }
-
-
-    @GetMapping("/viewStudents")
-    String viewStudents(Model model){
-
-        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-
-
-        model.addAttribute("students", studentService.getAllStudentData());
-        return "viewStudents.html";
-    }
-
-    @GetMapping("/editStudent")
-    String editStudent(Model model){
-        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-
-
-        model.addAttribute("student", new StudentDAO());
-        model.addAttribute("students",studentService.getAllStudentData());
-        return "editStudent.html";
-    }
-
-    @PostMapping("/submitEditStudent")
-    String submitEditStudent(@ModelAttribute( "student" ) StudentDAO studentDAO, Model model){
-
-        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-
-
-        System.out.println(studentDAO);
-
-
-        // now the edit works, just need to submit the edit to the database
-
-        model.addAttribute("student", new StudentDAO());
-
-        model.addAttribute("students",studentService.getAllStudentData());
-
-
-        return "editStudent.html";
-    }
-
-    @GetMapping("/newStudent")
-    String newStudent(Model model){
-        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-
-
-        model.addAttribute("student", new StudentDAO());
-        model.addAttribute("students",studentService.getAllStudentData());
-        return "newStudent.html";
-    }
-
-    @PostMapping ("/createUser")
-    String createStudent(@ModelAttribute( "student" ) StudentDAO studentDAO, Model model){
-
-        controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-
-
-        // Validation on student name
-        if(studentDAO.getStudentName().length() > 60){
-            model.addAttribute("errorMessage","Student Name must be shorter than 60 characters");
-        } else {
-            // This code block will execute if there are no errors in the data that was inputed by the client
-
-            // step 1) create the new student and attach the success message
-            String result = studentService.createStudent(studentDAO);
-            model.addAttribute("successMessage",result);
-
-            // step 2) fetch the list of students from the database and bind the list onto the page
-            model.addAttribute("students",studentService.getAllStudentData());
-
-        }
-
-        return "newStudent.html";
-    }
-
-
-    List<CancelTrainVO> calculateProgressBars(){
-
-        List<CancelTrainVO> cancelTrainVOList = cancelTrainRepo.findByOrderByUpvotesDesc();
-
-        // set progress bar value
-        for(CancelTrainVO cancelTrainVO : cancelTrainVOList){
-
-            int progress = 0;
-            if(cancelTrainVO.getDownvotes() >= cancelTrainVO.getUpvotes()){
-                progress = 0;
-            } else {
-                progress = cancelTrainVO.getUpvotes() - Math.abs(cancelTrainVO.getDownvotes());
-            }
-            cancelTrainVO.setProgressbar(progress);
-        }
 
 
 
-        // this will sort based on progress bar value desc
-        return cancelTrainVOList.stream()
-                .sorted(Comparator.comparing(CancelTrainVO::getProgressbar).reversed())
-                .collect(Collectors.toList());
-
-    }
 
 
 }

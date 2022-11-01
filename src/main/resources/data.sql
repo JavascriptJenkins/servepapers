@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS process_data;
+DROP TABLE IF EXISTS token;
+DROP TABLE IF EXISTS systemuser;
 
---CREATE SEQUENCE HIBERNATE_SEQUENCE START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE HIBERNATE_SEQUENCE START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE process_data (
   id INT AUTO_INCREMENT  PRIMARY KEY,
@@ -52,15 +54,24 @@ CREATE TABLE token (
 -- systemuser is a user of the system
 CREATE TABLE systemuser (
     id INT AUTO_INCREMENT  PRIMARY KEY,
-    username VARCHAR(250) NOT NULL,
-    password VARCHAR(250) NOT NULL,
     email VARCHAR(250) NOT NULL,
-    roles VARCHAR(250) NOT NULL,
+    password VARCHAR(250) NOT NULL,
+    roles ARRAY NOT NULL,
     phone VARCHAR(20) NOT NULL,
     isuseractive INT NOT NULL,
-    updatedtimestamp DATE NOT NULL,
-    createtimestamp DATE NOT NULL
+    updatedtimestamp TIMESTAMP NOT NULL,
+    createtimestamp TIMESTAMP NOT NULL
 );
+
+   INSERT INTO systemuser (email,
+                            password,
+                            roles,
+                            phone,
+                            isuseractive,
+                            updatedtimestamp,
+                            createtimestamp) VALUES
+     ('javascriptjenkins@gmail.com','$2a$10$yQoju5RnDO/WfxO6xFcddOzurPBWPOnThM6bwpM98GMCLMiZ7dr/q','READ,WRITE,','6128007774',1,'1970-01-01 12:12:12','1970-01-01 12:12:12');
+
 
 
 --   INSERT INTO cancel_train (fname,
