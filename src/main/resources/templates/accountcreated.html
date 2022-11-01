@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authorization</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Account creation success.</h1>
+        <h2><a href="http://localhost:8080/login/sendvalidationemail">Request new validation email.</a></h2>
+
+        <!--@RequestMapping("/studentView")-->
+        <form th:action="@{/login/createSystemUser}" th:object="${systemuser}" method="post">
+
+            <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
+            <div class="alert alert-info" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
+
+
+
+
+        </form>
+    </div>
+
+
+</body>
+</html>

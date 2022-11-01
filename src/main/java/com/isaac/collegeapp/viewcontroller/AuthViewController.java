@@ -195,6 +195,8 @@ public class AuthViewController {
 
                 // send user an email link to validate account
                 sendValidateEmailToken(tokenVO);
+                model.addAttribute("successMessage","Check your email to activate account: "+systemUserDAO.getEmail());
+                return "accountcreated.html";
 
             } catch(Exception ex){
                 model.addAttribute("errorMessage","System Error");
@@ -203,7 +205,6 @@ public class AuthViewController {
             }
 
 
-            model.addAttribute("successMessage","Check your email to activate account: "+systemUserDAO.getEmail());
 
         }
 
@@ -330,9 +331,10 @@ public class AuthViewController {
 
                 sb.append("Verify your new account at https://servepapers.techvvs.io/auth/verify&token="+newToken.getToken());
 
-                emailManager.generateAndSendEmail(sb.toString(), list, "Voting token from Cancel Train!");
+                emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
             } catch (Exception ex){
                 System.out.println("error sending email");
+                System.out.println(ex.getMessage());
 
             } finally{
                 tokenRepo.save(newToken);
