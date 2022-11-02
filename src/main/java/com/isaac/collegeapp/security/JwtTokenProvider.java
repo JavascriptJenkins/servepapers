@@ -1,6 +1,8 @@
 package com.isaac.collegeapp.security;
 
 import com.isaac.collegeapp.exception.CustomException;
+import com.isaac.collegeapp.model.StudentDAO;
+import org.springframework.security.web.csrf.CsrfToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -12,10 +14,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +31,14 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
+
+  public String getSecretKey() {
+    return secretKey;
+  }
+
+  public void setSecretKey(String secretKey) {
+    this.secretKey = secretKey;
+  }
 
   /**
    * THIS IS NOT A SECURE PRACTICE! For simplicity, we are storing a static key here. Ideally, in a
@@ -43,6 +58,9 @@ public class JwtTokenProvider {
 
   @Autowired
   private MyUserDetails myUserDetails;
+
+//  @Autowired
+//  JWTCsrfTokenRepository jwtCsrfTokenRepository;
 
   @PostConstruct
   protected void init() {
@@ -109,12 +127,49 @@ public class JwtTokenProvider {
     return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
   }
 
+  public String resolveTokenFromCookies(HttpServletRequest req) {
+
+    Cookie[] cookelist = req.getCookies();
+
+    if(cookelist != null){
+      Cookie cookie = cookelist[0];
+
+      String bearerToken = cookie.getValue();
+      if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        return bearerToken.substring(7);
+      }
+
+    }
+    return null;
+  }
+
+
+
   public String resolveToken(HttpServletRequest req) {
     String bearerToken = req.getHeader("Authorization");
     if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }
     return null;
+  }
+
+  public String resolveTokenFromHiddenCustomParam(HttpServletRequest req) {
+
+    Object rerqatt = req.getAttribute("customJwtParameter");
+
+    return null;
+    // return String.valueOf(req.getAttribute("_csrf"));
+  }
+
+  public String resolveTokenFromCSFR(HttpServletRequest req) {
+
+    Object rerqatt = req.getAttribute("_csrf");
+    if(rerqatt != null){
+      return ((CsrfToken) rerqatt).getToken();
+    }
+
+    return null;
+   // return String.valueOf(req.getAttribute("_csrf"));
   }
 
   public String resolveTokenFromWebSocket(HttpServletRequest req) {

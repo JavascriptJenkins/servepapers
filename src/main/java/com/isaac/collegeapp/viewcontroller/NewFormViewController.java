@@ -7,7 +7,7 @@ import com.isaac.collegeapp.h2model.CancelTrainVO;
 import com.isaac.collegeapp.h2model.TokenVO;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
-import com.isaac.collegeapp.model.StudentDAO;
+import com.isaac.collegeapp.model.ProcessDataDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
@@ -19,16 +19,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Optional;
 
-@RequestMapping("/login")
+@RequestMapping("/newform")
 @Controller
-public class AuthViewController {
+public class NewFormViewController {
 
     @Autowired
     StudentService studentService;
@@ -66,160 +66,21 @@ public class AuthViewController {
 
     //default home mapping
     @GetMapping
-    String viewAuthPage(Model model){
+    String viewNewForm(Model model, @RequestParam("customJwtParameter") String customJwtParameter){
 
-        model.addAttribute("systemuser", new SystemUserDAO());
-        return "auth.html";
+        System.out.println("customJwtParam on newform controller: "+customJwtParameter);
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        model.addAttribute("processdata", new ProcessDataDAO());
+        return "newform.html";
     }
 
-    //error page displayed when nobody is logged in
-    @GetMapping("/error")
-    String showErrorPage(Model model){
-
-        model.addAttribute("systemuser", new SystemUserDAO());
-        return "error.html";
-    }
-
-    //error page displayed when nobody is logged in
-    @GetMapping("/createaccount")
-    String viewCreateAccount(Model model){
-
-        model.addAttribute("systemuser", new SystemUserDAO());
-        return "newaccount.html";
-    }
-
-    @GetMapping("/verify")
-    String viewAuthVerify(@RequestParam("token") String token, Model model){
-
-
-        TokenVO tokenVO = tokenRepo.findByToken(token);
-
-
-        if(checkTokenExpire(tokenVO.getCreatetimestamp()) == 1){
-            // if token is expired tell user to request another
-            return "authRequestNewToken.html";
-        }
-
-
-        SystemUserDAO systemUserDAO = systemUserRepo.findByEmail(tokenVO.getEmail());
-
-
-
-
-        if(tokenVO != null && tokenVO.getEmail() != null
-                && systemUserDAO != null
-                && tokenVO.getTokenused() == 0
-
-        ){
-
-            // update system user object
-            systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
-            systemUserDAO.setIsuseractive(1);
-           // systemUserDAO.setRoles(staticRoles.getREAD()+staticRoles.getWRITE()); // add write access
-            Role[] array = new Role[1];
-            array[0] = Role.ROLE_CLIENT;
-            systemUserDAO.setRoles(array); // add write access
-
-            try{
-                systemUserRepo.save(systemUserDAO);
-            } catch (Exception ex){
-                model.addAttribute("errorMessage", "System Error.  Try again or contact support: support@techvvs.io");
-
-                System.out.println("Error in viewAuthVerify: "+ex.getMessage());
-                return "authVerifySuccess.html";
-            }
-
-            try{
-                tokenVO.setTokenused(1);
-                tokenVO.setUpdatedtimestamp(LocalDateTime.now());
-                tokenRepo.save(tokenVO);
-            } catch (Exception ex){
-                model.addAttribute("errorMessage", "System Error.  Try again or contact support: support@techvvs.io");
-
-                System.out.println("Error in viewAuthVerify: "+ex.getMessage());
-                return "authVerifySuccess.html";
-            }
-
-
-            // add data for page display
-            model.addAttribute("token", tokenVO.getEmail());
-            model.addAttribute("successMessage", "Success activating account with email: "+tokenVO.getEmail());
-        }
-        return "authVerifySuccess.html";
-    }
-
-    int checkTokenExpire(LocalDateTime tokencreated){
-
-        LocalDateTime oneHourFromTokenCreation = tokencreated.plusHours(1);
-        LocalDateTime now = LocalDateTime.now();
-
-        if(now.isAfter(oneHourFromTokenCreation)){
-            return 1; // this means one hour has passed and token is invalid
-        }
-
-        return 0;
-    }
-
-    @PostMapping ("/createSystemUser")
-    String createSystemUser(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model){
+    @PostMapping ("/createNewProcessData")
+    String createNewProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,@RequestParam("token") String token, Model model){
 
         //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
 
-        Role[] array = new Role[1];
-        array[0] = Role.ROLE_CLIENT;
-        systemUserDAO.setRoles(array); // add write access
-
-        systemUserDAO.setIsuseractive(0); // set this to 1 when email token is created
-       // systemUserDAO.setId(0);
-        systemUserDAO.setCreatetimestamp(LocalDateTime.now());
-        systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
-
-
-
-        String errorResult = validateCreateSystemUser(systemUserDAO);
-
-        Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
-
-
-        // Validation on student name
-        if(!errorResult.equals("success") || existingUser.isPresent()){
-            model.addAttribute("errorMessage",errorResult);
-        } else {
-            // This code block will execute if there are no errors in the data that was inputed by the client
-
-            // step 1) create the new student and attach the success message
-
-            // give the user read priveledges until account is activated
-            //systemUserDAO.setRoles(staticRoles.getREAD());
-
-
-            try{
-
-                systemUserDAO.setPassword(passwordEncoder.encode(systemUserDAO.getPassword()));
-
-                systemUserRepo.save(systemUserDAO);
-
-                TokenVO tokenVO = new TokenVO();
-
-                tokenVO.setEmail(systemUserDAO.getEmail());
-                tokenVO.setTokenused(0);
-
-                // send user an email link to validate account
-                sendValidateEmailToken(tokenVO);
-                model.addAttribute("successMessage","Check your email to activate account: "+systemUserDAO.getEmail());
-                return "accountcreated.html";
-
-            } catch(Exception ex){
-                model.addAttribute("errorMessage","System Error");
-                System.out.println("TechVVS System Error in createSystemUser: "+ex.getMessage());
-                return "newaccount.html"; // return early with error
-            }
-
-
-
-        }
-
-        return "newaccount.html";
+        return "newform.html";
     }
 
     @PostMapping ("/systemuser")
@@ -259,7 +120,7 @@ public class AuthViewController {
 //                        cookie.setPath("/");
 //                        response.addCookie(cookie);
 
-                        model.addAttribute("customJwtParameter",token1.getToken());
+                        model.addAttribute("customJwtParameter",mapper.writeValueAsString(token1));
                         response.setHeader("Authorization: Bearer", mapper.writeValueAsString(token1));
                      //   return mapper.writeValueAsString(token1);
 

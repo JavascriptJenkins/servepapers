@@ -45,6 +45,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- provides integration with tyhmeleaf -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
+			<version>3.1.0.RC1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -76,7 +83,7 @@
 			<!-- Starter for using Spring Security -->
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-			<version>2.0.0.RELEASE</version>
+			<version>2.7.5</version>
 		</dependency>
 
 		<dependency>

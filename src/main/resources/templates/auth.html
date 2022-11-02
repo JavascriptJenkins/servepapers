@@ -9,7 +9,7 @@
         <h1>Login to the Servepapers TechVVS system.</h1>
 
         <!--@RequestMapping("/studentView")-->
-        <form th:action="@{/auth/createSystemUser}" th:object="${systemuser}" method="post">
+        <form th:action="@{/login/systemuser}" th:object="${systemuser}" method="post">
 
             <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
             <div class="alert alert-info" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>

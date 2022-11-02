@@ -13,14 +13,14 @@ CREATE TABLE process_data (
   actioncounter1 INT NOT NULL,
   actioncounter2 INT NOT NULL,
   notes VARCHAR(1000) NOT NULL, -- Note, find out what is largest size for this notes section
-  address1 VARCHAR(500) NOT NULL,
-  address2 VARCHAR(500) NOT NULL,
-  race VARCHAR(500) NOT NULL,
-  city VARCHAR(500) NOT NULL,
-  state VARCHAR(500) NOT NULL,
-  zipcode VARCHAR(500) NOT NULL,
-  height VARCHAR(500) NOT NULL,
-  haircolor VARCHAR(250) NOT NULL,
+  address1 VARCHAR(200) NOT NULL,
+  address2 VARCHAR(100) NOT NULL,
+  race VARCHAR(10) NOT NULL,
+  city VARCHAR(100) NOT NULL,
+  state VARCHAR(10) NOT NULL,
+  zipcode VARCHAR(10) NOT NULL,
+  height VARCHAR(10) NOT NULL,
+  haircolor VARCHAR(20) NOT NULL,
   updatedtimestamp TIMESTAMP NOT NULL,
   createtimestamp TIMESTAMP NOT NULL
   );

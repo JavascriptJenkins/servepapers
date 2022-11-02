@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Collections;
@@ -21,6 +22,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    CsrfTokenRepository jwtCsrfTokenRepository;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -33,9 +37,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // Entry points
     // ANYTHING AUTH NEEDS TO BE DECLARED HERE
-    http.authorizeRequests()//
+    http
+      // Apply JWT
+            .apply(new JwtTokenFilterConfigurer(jwtTokenProvider))
+                            .and()
+
+            .csrf()
+
+//            .csrfTokenRepository(jwtCsrfTokenRepository)
+            .and()
+
+            .authorizeRequests()//
         .antMatchers("/login").permitAll()//
-        .antMatchers("/users/signup").permitAll()//
+        .antMatchers("/css/table.css").permitAll()//
+        .antMatchers("/login/systemuser").permitAll()//
         .antMatchers("/login/createSystemUser").permitAll()//
         .antMatchers("/login/createaccount").permitAll()//
         .antMatchers("/users/sendResetToken").permitAll()//
@@ -61,7 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.exceptionHandling().accessDeniedPage("/login");
 
     // Apply JWT
-    http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+//    http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
 
     // Optional, if you want to test the API from a browser
     // http.httpBasic();

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 @RequestMapping("/")
 @Controller
@@ -31,7 +32,9 @@ public class HomeViewController {
     @GetMapping
     String index(Model model){
 
+        model.addAttribute(Objects.requireNonNull(model.getAttribute("customJwtParameter")));
 
+        System.out.println("PARAM ON CONTROLLER: " + model.getAttribute("customJwtParameter"));
         System.out.println( httpServletRequest);
 
        // model.addAttribute("student", new StudentDAO());
