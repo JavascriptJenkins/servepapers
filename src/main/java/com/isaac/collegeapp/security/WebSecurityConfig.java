@@ -60,15 +60,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/h2-console/**/**").permitAll()
         // Disallow everything else..
         .anyRequest().authenticated()
-    .and()
-            .cors().configurationSource(request -> {
-              CorsConfiguration config = new CorsConfiguration();
-              config.setAllowedHeaders(Collections.singletonList("*"));
-              config.setAllowedMethods(Collections.singletonList("*"));
-              config.addAllowedOrigin("*");
-              config.setAllowCredentials(true);
-              return config;
-            })
+
+
     //.cors().configurationSource(corsConfigurationSource())
     ;
 
