@@ -4,23 +4,26 @@ DROP TABLE IF EXISTS systemuser;
 
 CREATE SEQUENCE HIBERNATE_SEQUENCE START WITH 1 INCREMENT BY 1;
 
-CREATE TABLE process_data (
+CREATE TABLE processdata (
   id INT AUTO_INCREMENT  PRIMARY KEY,
   fname VARCHAR(250) NOT NULL,
+  filenumber INT NOT NULL,
   mname VARCHAR(250) NOT NULL,
   lname VARCHAR(250) NOT NULL,
   age INT NOT NULL,
   actioncounter1 INT NOT NULL,
   actioncounter2 INT NOT NULL,
-  notes VARCHAR(1000) NOT NULL, -- Note, find out what is largest size for this notes section
+  notes VARCHAR(1000), -- Note, find out what is largest size for this notes section
   address1 VARCHAR(200) NOT NULL,
-  address2 VARCHAR(100) NOT NULL,
-  race VARCHAR(10) NOT NULL,
+  address2 VARCHAR(100),
+  race VARCHAR(20) NOT NULL,
   city VARCHAR(100) NOT NULL,
-  state VARCHAR(10) NOT NULL,
+  state VARCHAR(100) NOT NULL,
   zipcode VARCHAR(10) NOT NULL,
   height VARCHAR(10) NOT NULL,
   haircolor VARCHAR(20) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  lastattemptvisit TIMESTAMP NOT NULL,
   updatedtimestamp TIMESTAMP NOT NULL,
   createtimestamp TIMESTAMP NOT NULL
   );

@@ -5,6 +5,7 @@ import com.isaac.collegeapp.constants.StaticRoles;
 import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.h2model.CancelTrainVO;
 import com.isaac.collegeapp.h2model.TokenVO;
+import com.isaac.collegeapp.jparepo.ProcessDataRepo;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.ProcessDataDAO;
@@ -14,6 +15,8 @@ import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,6 +56,9 @@ public class NewFormViewController {
     SystemUserRepo systemUserRepo;
 
     @Autowired
+    ProcessDataRepo processDataRepo;
+
+    @Autowired
     StaticRoles staticRoles;
 
     @Autowired
@@ -66,108 +72,170 @@ public class NewFormViewController {
 
     //default home mapping
     @GetMapping
-    String viewNewForm(Model model, @RequestParam("customJwtParameter") String customJwtParameter){
+    String viewNewForm(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO, Model model, @RequestParam("customJwtParameter") String customJwtParameter){
 
         System.out.println("customJwtParam on newform controller: "+customJwtParameter);
 
+        ProcessDataDAO processDataDAOToBind;
+        if(processDataDAO != null && processDataDAO.getId() != null){
+            processDataDAOToBind = processDataDAO;
+        } else {
+            processDataDAOToBind = new ProcessDataDAO();
+            processDataDAOToBind.setFilenumber(secureRandom.nextInt(10000000));
+        }
+
+
+
         model.addAttribute("customJwtParameter", customJwtParameter);
-        model.addAttribute("processdata", new ProcessDataDAO());
+        model.addAttribute("processdata", processDataDAOToBind);
         return "newform.html";
     }
+
 
     @PostMapping ("/createNewProcessData")
-    String createNewProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,@RequestParam("token") String token, Model model){
+    String createNewProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,
+                                Model model,
+                                HttpServletResponse response,
+                                @RequestParam("customJwtParameter") String customJwtParameter
+    ){
 
-        //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("----------------------- START AUTH INFO ");
+        System.out.println("authentication.getCredentials: "+authentication.getCredentials());
+        System.out.println("authentication.getPrincipal: "+authentication.getPrincipal());
+        System.out.println("authentication.getAuthorities: "+authentication.getAuthorities());
+        System.out.println("----------------------- END AUTH INFO ");
 
-        return "newform.html";
-    }
 
-    @PostMapping ("/systemuser")
-    String login(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model, HttpServletResponse response){
-
-        //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
-
-        String errorResult = validateLoginInfo(systemUserDAO);
+        String errorResult = validateNewFormInfo(processDataDAO);
 
         // Validation
         if(!errorResult.equals("success")){
             model.addAttribute("errorMessage",errorResult);
         } else {
 
-            try{
-                Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
+            // when creating a new processData entry, set the last attempt visit to now - this may change in future
+            processDataDAO.setLastattemptvisit(LocalDateTime.now());
+            processDataDAO.setCreatetimestamp(LocalDateTime.now());
+            processDataDAO.setUpdatedtimestamp(LocalDateTime.now());
 
-                if(existingUser.isPresent()){
-                    String token = userService.signin(
-                            systemUserDAO.getEmail(),
-                            systemUserDAO.getPassword());
+            if(processDataDAO.getActioncounter1() != null){
+                processDataDAO.setActioncounter1(processDataDAO.getActioncounter1()+1);
+            } else {
+                processDataDAO.setActioncounter1(1);
+            }
 
-                    Token token1;
-                    if(token != null){
-//                            logger.info("SIGN-IN TOKEN GENERATED!!! ");
-                        System.out.println("SIGN-IN TOKEN GENERATED!!! ");
-                        token1 = new Token();
-                        token1.setToken(token);
-                        // return mapper.writeValueAsString(token1);
-
-
-
-                        // put this token in http response and it will be read by filter on
-                        // next requests (i think)
-
-//                        Cookie cookie = new Cookie("Authorization: Bearer", mapper.writeValueAsString(token1));
-//                        cookie.setPath("/");
-//                        response.addCookie(cookie);
-
-                        model.addAttribute("customJwtParameter",mapper.writeValueAsString(token1));
-                        response.setHeader("Authorization: Bearer", mapper.writeValueAsString(token1));
-                     //   return mapper.writeValueAsString(token1);
-
-
-
-                    } else {
-//                            logger.info("TOKEN IS NULL THIS IS BAD BRAH! ");
-                        System.out.println("TOKEN IS NULL THIS IS BAD BRAH! ");
-                    }
-                }
-
-            } catch(Exception ex){
-                model.addAttribute("errorMessage","System Error");
-                System.out.println("TechVVS System Error in login: "+ex.getMessage());
-                return "auth.html"; // return early with error
+            if(processDataDAO.getActioncounter2() != null){
+                processDataDAO.setActioncounter2(processDataDAO.getActioncounter2()+1);
+            } else {
+                processDataDAO.setActioncounter2(1);
             }
 
 
-            model.addAttribute("successMessage","You are logged in: "+systemUserDAO.getEmail());
+            ProcessDataDAO result = processDataRepo.save(processDataDAO);
 
+            model.addAttribute("successMessage","Record Successfully Saved. ");
+            model.addAttribute("processdata", result);
 
         }
 
-        return "index.html";
+
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        return "newform.html";
     }
 
 
-    String validateLoginInfo(SystemUserDAO systemUserDAO){
+    String validateNewFormInfo(ProcessDataDAO processDataDAO){
 
 
-        if(systemUserDAO.getEmail().length() < 6
-                || systemUserDAO.getEmail().length() > 200
-                || !systemUserDAO.getEmail().contains("@")
-                || !systemUserDAO.getEmail().contains(".com")
-
+        if(processDataDAO.getFname() != null &&
+                (processDataDAO.getFname().length() > 250
+                || processDataDAO.getFname().length() < 1)
         ){
-            return "email must be between 6-200 characters and contain @ and .com";
-        } else {
-            systemUserDAO.setEmail(systemUserDAO.getEmail().trim());
-            systemUserDAO.setEmail(systemUserDAO.getEmail().replaceAll(" ",""));
+            return "first name must be between 1-250 characters. ";
+        }
+
+        if(processDataDAO.getLname() != null &&
+                (processDataDAO.getLname().length() > 250
+                || processDataDAO.getLname().length() < 1)
+        ){
+            return "last name must be between 1-250 characters. ";
+        }
+
+        if(
+                processDataDAO.getMname() != null &&
+                (processDataDAO.getMname().length() > 250
+                || processDataDAO.getMname().length() < 1)
+        ){
+            return "middle name must be between 1-250 characters. ";
+        }
+
+        if(processDataDAO.getPhone() != null &&
+                (processDataDAO.getPhone().length() > 11
+                || processDataDAO.getPhone().length() < 10
+                || processDataDAO.getPhone().contains("-")
+                || processDataDAO.getPhone().contains("."))
+        ){
+            return "enter 10 or 11 digit phone number with no spaces or symbols.  ex. 18884445555";
+        } else if (processDataDAO.getPhone() != null) {
+            processDataDAO.setPhone(processDataDAO.getPhone().trim());
+            processDataDAO.setPhone(processDataDAO.getPhone().replaceAll(" ",""));
+            processDataDAO.setPhone(processDataDAO.getPhone().replaceAll("\\)",""));
+        }
+
+        if(processDataDAO.getAge() != null && (processDataDAO.getAge() > 140
+                || processDataDAO.getPhone().length() < 1)
+        ){
+            return "age must be between 1-140. ";
         }
 
 
-        if( systemUserDAO.getPassword().length() > 200
-                || systemUserDAO.getPassword().length() < 8 ){
-            return "password must be between 8-200 characters";
+        if(processDataDAO.getNotes() != null && (processDataDAO.getNotes().length() > 1000)
+        ){
+            return "Notes must be less than 1000 characters";
         }
+
+        if(processDataDAO.getAddress1() != null && (processDataDAO.getAddress1().length() > 200)
+        ){
+            return "address1 must be less than 200 characters";
+        }
+
+        if(processDataDAO.getAddress2() != null && processDataDAO.getAddress2().length() > 200
+        ){
+            return "address2 must be less than 200 characters";
+        }
+
+        if(processDataDAO.getRace() != null && processDataDAO.getRace().length() > 20
+        ){
+            return "race must be less than 20 characters";
+        }
+
+        if(processDataDAO.getCity() != null && processDataDAO.getCity().length() > 100
+        ){
+            return "city must be less than 100 characters";
+        }
+
+        if(processDataDAO.getState() != null && processDataDAO.getState().length() > 100
+        ){
+            return "state must be less than 100 characters";
+        }
+
+        if(processDataDAO.getZipcode() != null && processDataDAO.getZipcode().length() > 10
+        ){
+            return "zipcode must be less than 100 characters";
+        }
+
+        if(processDataDAO.getHeight() != null && processDataDAO.getHeight().length() > 10
+        ){
+            return "height must be less than 10 characters";
+        }
+
+        if(processDataDAO.getHaircolor() != null && processDataDAO.getHaircolor().length() > 20
+        ){
+            return "hair color must be less than 20 characters";
+        }
+
         return "success";
     }
 
@@ -231,7 +299,7 @@ public class NewFormViewController {
                 list.add(newToken.getEmail());
                 StringBuilder sb = new StringBuilder();
 
-                sb.append("Verify your new account at https://servepapers.techvvs.io/auth/verify&token="+newToken.getToken());
+                sb.append("Verify your new account at http://localhost:8080/auth/verify&token="+newToken.getToken());
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
             } catch (Exception ex){

@@ -244,29 +244,13 @@ public class AuthViewController {
 
                     Token token1;
                     if(token != null){
-//                            logger.info("SIGN-IN TOKEN GENERATED!!! ");
                         System.out.println("SIGN-IN TOKEN GENERATED!!! ");
                         token1 = new Token();
                         token1.setToken(token);
-                        // return mapper.writeValueAsString(token1);
-
-
-
-                        // put this token in http response and it will be read by filter on
-                        // next requests (i think)
-
-//                        Cookie cookie = new Cookie("Authorization: Bearer", mapper.writeValueAsString(token1));
-//                        cookie.setPath("/");
-//                        response.addCookie(cookie);
-
                         model.addAttribute("customJwtParameter",token1.getToken());
                         response.setHeader("Authorization: Bearer", mapper.writeValueAsString(token1));
-                     //   return mapper.writeValueAsString(token1);
-
-
 
                     } else {
-//                            logger.info("TOKEN IS NULL THIS IS BAD BRAH! ");
                         System.out.println("TOKEN IS NULL THIS IS BAD BRAH! ");
                     }
                 }
@@ -370,7 +354,7 @@ public class AuthViewController {
                 list.add(newToken.getEmail());
                 StringBuilder sb = new StringBuilder();
 
-                sb.append("Verify your new account at https://servepapers.techvvs.io/auth/verify&token="+newToken.getToken());
+                sb.append("Verify your new account at http://localhost:8080/auth/verify&token="+newToken.getToken());
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
             } catch (Exception ex){

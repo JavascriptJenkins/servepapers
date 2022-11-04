@@ -16,38 +16,6 @@ public class ProcessDataDAO {
     @Column(name="id")
     Integer id;
 
-    public Integer getFilenumber() {
-        return filenumber;
-    }
-
-    public void setFilenumber(Integer filenumber) {
-        this.filenumber = filenumber;
-    }
-
-    public String getMname() {
-        return mname;
-    }
-
-    public void setMname(String mname) {
-        this.mname = mname;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public LocalDateTime getLastattemptvisit() {
-        return lastattemptvisit;
-    }
-
-    public void setLastattemptvisit(LocalDateTime lastattemptvisit) {
-        this.lastattemptvisit = lastattemptvisit;
-    }
-
     @Column(name="filenumber")
     Integer filenumber;
 
@@ -220,6 +188,38 @@ public class ProcessDataDAO {
 
     public void setHaircolor(String haircolor) {
         this.haircolor = haircolor;
+    }
+
+    public Integer getFilenumber() {
+        return filenumber;
+    }
+
+    public void setFilenumber(Integer filenumber) {
+        this.filenumber = filenumber;
+    }
+
+    public String getMname() {
+        return mname;
+    }
+
+    public void setMname(String mname) {
+        this.mname = mname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDateTime getLastattemptvisit() {
+        return lastattemptvisit;
+    }
+
+    public void setLastattemptvisit(LocalDateTime lastattemptvisit) {
+        this.lastattemptvisit = lastattemptvisit;
     }
 
     public LocalDateTime getUpdatedtimestamp() {

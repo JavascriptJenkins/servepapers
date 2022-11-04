@@ -29,11 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter implements CsrfTokenRep
   protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
       logger.info("REQUEST HIT JwtTokenFilter: "+httpServletRequest.getRequestURI());
       logger.info(" JwtTokenFilter: "+httpServletRequest.getMethod());
-    //String token = jwtTokenProvider.resolveTokenFromHiddenCustomParam(httpServletRequest);
-   // String token = jwtTokenProvider.resolveTokenFromCSFR(httpServletRequest);
-    //String token = jwtTokenProvider.resolveTokenFromCookies(httpServletRequest);
 
-    //System.out.println("PARAM ON FILTER: "+ httpServletRequest.getAttribute("customJwtParameter"));
     System.out.println("PARAM ON FILTER: "+ httpServletRequest.getParameter("customJwtParameter"));
     String token = httpServletRequest.getParameter("customJwtParameter");
 
@@ -48,33 +44,15 @@ public class JwtTokenFilter extends OncePerRequestFilter implements CsrfTokenRep
       logger.info("TOKEN VALIDATED WITH SUBJECT: "+tokenSubject);
 
 
-
-
-//      if("default".equals(tokenSubject) && httpServletRequest.getRequestURI().equals("/login/createSystemUser")
-//      || "default".equals(tokenSubject) && httpServletRequest.getRequestURI().equals("/login/systemuser")
-//      || "default".equals(tokenSubject) && httpServletRequest.getRequestURI().equals("/login")
-//      || "default".equals(tokenSubject) && httpServletRequest.getRequestURI().equals("/")
-//      || "default".equals(tokenSubject) && httpServletRequest.getRequestURI().equals("/login/createaccount")
-//      ){
-//        System.out.println("DEFAULT TOKEN --> ACCESS TO /login/createSystemUser AND /login/systemuser GRANTED");
-//      } else {
         Authentication auth = jwtTokenProvider.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
 //      }
 
-      } else if ("/api/ws".equals(httpServletRequest.getRequestURI())){
-        logger.info("Web Socket request Came in, lettin er' thru na");
-
-        token = jwtTokenProvider.resolveTokenFromWebSocket(httpServletRequest);
-        String tokenSubject = jwtTokenProvider.getTokenSubject(token);
-        logger.info("Web Socket TOKEN VALIDATED WITH SUBJECT: "+tokenSubject);
-
-        Authentication auth = jwtTokenProvider.getAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        httpServletResponse.setStatus(101); // when connecting, ws protocol needs to return 101
-
+      } else if(httpServletRequest.getRequestURI().equals("/css/table.css")){
+        logger.info("REQUEST FOR CSS");
       }
     } catch (CustomException ex) {
+        logger.info("Exception on JWT controller: "+ex.getMessage());
       //this is very important, since it guarantees the user is not authenticated at all
       SecurityContextHolder.clearContext();
       httpServletResponse.sendError(ex.getHttpStatus().value(), ex.getMessage());
