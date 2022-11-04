@@ -114,6 +114,15 @@
             <input style="width:648px;height:163px;" type="text" th:field="*{notes}" class="form-control" placeholder="notes" aria-label="notes">
         </div>
 
+
+
+        <input type="hidden" th:field="*{lastattemptvisit}">
+        <input type="hidden" th:field="*{updatedtimestamp}">
+        <input type="hidden" th:field="*{createtimestamp}">
+        <input type="hidden" th:field="*{actioncounter1}">
+        <input type="hidden" th:field="*{actioncounter2}">
+        <input type="hidden" th:field="*{id}">
+
         <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>
 
 

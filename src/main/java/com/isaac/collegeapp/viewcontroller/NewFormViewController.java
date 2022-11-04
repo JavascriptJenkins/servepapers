@@ -132,20 +132,20 @@ public class NewFormViewController {
     String viewEditForm(
                     Model model,
                     @RequestParam("customJwtParameter") String customJwtParameter,
-                    @RequestParam("filenumber") Integer filenumber){
+                    @RequestParam("filenumber") String filenumber){
 
         System.out.println("customJwtParam on newform controller: "+customJwtParameter);
 
         List<ProcessDataDAO> results = new ArrayList<ProcessDataDAO>();
         if(filenumber != null){
             System.out.println("Searching data by filenumber");
-            results = processDataRepo.findAllByFilenumber(filenumber);
+            results = processDataRepo.findAllByFilenumber(Integer.valueOf(filenumber));
         }
 
 
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", results.get(0));
-        return "searchforms.html";
+        return "editforms.html";
     }
 
 
@@ -191,13 +191,10 @@ public class NewFormViewController {
 
             model.addAttribute("successMessage","Record Successfully Saved. ");
             model.addAttribute("processdata", result);
-
         }
 
-
-
         model.addAttribute("customJwtParameter", customJwtParameter);
-        return "newform.html";
+        return "editforms.html";
     }
 
     @PostMapping ("/createNewProcessData")
