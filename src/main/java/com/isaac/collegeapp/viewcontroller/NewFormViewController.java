@@ -10,13 +10,16 @@ import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.ProcessDataDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
+import com.isaac.collegeapp.modelnonpersist.FileVO;
 import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
+import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,11 +49,13 @@ public class NewFormViewController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-
+    private final String UPLOAD_DIR = "./uploads/";
 
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    @Autowired
+    TechvvsFileHelper techvvsFileHelper;
 
 
     @Autowired
@@ -142,6 +147,15 @@ public class NewFormViewController {
             results = processDataRepo.findAllByFilenumber(Integer.valueOf(filenumber));
         }
 
+        // check to see if there are files uploaded related to this filenumber
+        List<FileVO> filelist = techvvsFileHelper.getFilesByFileNumber(Integer.valueOf(filenumber), UPLOAD_DIR);
+
+        if(filelist.size() > 0){
+            model.addAttribute("filelist", filelist);
+        } else {
+            model.addAttribute("filelist", null);
+        }
+
 
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", results.get(0));
@@ -188,6 +202,14 @@ public class NewFormViewController {
 
 
             ProcessDataDAO result = processDataRepo.save(processDataDAO);
+
+            // check to see if there are files uploaded related to this filenumber
+            List<FileVO> filelist = techvvsFileHelper.getFilesByFileNumber(processDataDAO.getFilenumber(), UPLOAD_DIR);
+            if(filelist.size() > 0){
+                model.addAttribute("filelist", filelist);
+            } else {
+                model.addAttribute("filelist", null);
+            }
 
             model.addAttribute("successMessage","Record Successfully Saved. ");
             model.addAttribute("processdata", result);
@@ -331,9 +353,14 @@ public class NewFormViewController {
             return "zipcode must be less than 100 characters";
         }
 
-        if(processDataDAO.getHeight() != null && processDataDAO.getHeight().length() > 10
+        if(processDataDAO.getHeightfeet() != null && processDataDAO.getHeightfeet() > 10
         ){
-            return "height must be less than 10 characters";
+            return "height feet must be less than 10";
+        }
+
+        if(processDataDAO.getHeightinches() != null && processDataDAO.getHeightinches() > 12
+        ){
+            return "height inches must be less than 12";
         }
 
         if(processDataDAO.getHaircolor() != null && processDataDAO.getHaircolor().length() > 20

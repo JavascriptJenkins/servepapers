@@ -182,9 +182,11 @@ public class AuthViewController {
 
 
         // Validation on student name
-        if(!errorResult.equals("success") || existingUser.isPresent()){
+        if(!errorResult.equals("success")){
             model.addAttribute("errorMessage",errorResult);
-        } else {
+        } else if(existingUser.isPresent()){
+            model.addAttribute("errorMessage","Cannot create account. ");
+        } else{
             // This code block will execute if there are no errors in the data that was inputed by the client
 
             // step 1) create the new student and attach the success message

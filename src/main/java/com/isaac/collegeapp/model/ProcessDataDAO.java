@@ -58,8 +58,27 @@ public class ProcessDataDAO {
     @Column(name="zipcode")
     String zipcode;
 
-    @Column(name="height")
-    String height;
+    @Column(name="heightfeet")
+    Integer heightfeet;
+
+    public Integer getHeightfeet() {
+        return heightfeet;
+    }
+
+    public void setHeightfeet(Integer heightfeet) {
+        this.heightfeet = heightfeet;
+    }
+
+    public Integer getHeightinches() {
+        return heightinches;
+    }
+
+    public void setHeightinches(Integer heightinches) {
+        this.heightinches = heightinches;
+    }
+
+    @Column(name="heightinches")
+    Integer heightinches;
 
     @Column(name="haircolor")
     String haircolor;
@@ -172,14 +191,6 @@ public class ProcessDataDAO {
 
     public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
-    }
-
-    public String getHeight() {
-        return height;
-    }
-
-    public void setHeight(String height) {
-        this.height = height;
     }
 
     public String getHaircolor() {
