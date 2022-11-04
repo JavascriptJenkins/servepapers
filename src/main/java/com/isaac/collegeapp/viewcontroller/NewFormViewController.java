@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/newform")
@@ -91,6 +92,113 @@ public class NewFormViewController {
         return "newform.html";
     }
 
+    @GetMapping("/searchProcessData")
+    String searchProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO, Model model, @RequestParam("customJwtParameter") String customJwtParameter){
+
+        System.out.println("customJwtParam on newform controller: "+customJwtParameter);
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        model.addAttribute("processdata", new ProcessDataDAO());
+        model.addAttribute("processdatas", new ArrayList<ProcessDataDAO>(1));
+        return "searchforms.html";
+    }
+
+    @PostMapping("/searchProcessData")
+    String searchProcessDataPost(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO, Model model, @RequestParam("customJwtParameter") String customJwtParameter){
+
+        System.out.println("customJwtParam on newform controller: "+customJwtParameter);
+
+        List<ProcessDataDAO> results = new ArrayList<ProcessDataDAO>();
+        if(processDataDAO.getFilenumber() != null){
+            System.out.println("Searching data by getFilenumber");
+            results = processDataRepo.findAllByFilenumber(processDataDAO.getFilenumber());
+        }
+        if(processDataDAO.getFname() != null && results.size() == 0){
+            System.out.println("Searching data by getFname");
+            results = processDataRepo.findAllByFname(processDataDAO.getFname());
+        }
+        if(processDataDAO.getLname() != null && results.size() == 0){
+            System.out.println("Searching data by getLname");
+            results = processDataRepo.findAllByLname(processDataDAO.getLname());
+        }
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        model.addAttribute("processdata", processDataDAO);
+        model.addAttribute("processdatas", results);
+        return "searchforms.html";
+    }
+
+    @GetMapping("/editform")
+    String viewEditForm(
+                    Model model,
+                    @RequestParam("customJwtParameter") String customJwtParameter,
+                    @RequestParam("filenumber") Integer filenumber){
+
+        System.out.println("customJwtParam on newform controller: "+customJwtParameter);
+
+        List<ProcessDataDAO> results = new ArrayList<ProcessDataDAO>();
+        if(filenumber != null){
+            System.out.println("Searching data by filenumber");
+            results = processDataRepo.findAllByFilenumber(filenumber);
+        }
+
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        model.addAttribute("processdata", results.get(0));
+        return "searchforms.html";
+    }
+
+
+    @PostMapping ("/editProcessData")
+    String editProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,
+                                Model model,
+                                HttpServletResponse response,
+                                @RequestParam("customJwtParameter") String customJwtParameter
+    ){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("----------------------- START AUTH INFO ");
+        System.out.println("authentication.getCredentials: "+authentication.getCredentials());
+        System.out.println("authentication.getPrincipal: "+authentication.getPrincipal());
+        System.out.println("authentication.getAuthorities: "+authentication.getAuthorities());
+        System.out.println("----------------------- END AUTH INFO ");
+
+
+        String errorResult = validateNewFormInfo(processDataDAO);
+
+        // Validation
+        if(!errorResult.equals("success")){
+            model.addAttribute("errorMessage",errorResult);
+        } else {
+
+            // when creating a new processData entry, set the last attempt visit to now - this may change in future
+            processDataDAO.setUpdatedtimestamp(LocalDateTime.now());
+
+            if(processDataDAO.getActioncounter1() != null){
+                processDataDAO.setActioncounter1(processDataDAO.getActioncounter1()+1);
+            } else {
+                processDataDAO.setActioncounter1(1);
+            }
+
+            if(processDataDAO.getActioncounter2() != null){
+                processDataDAO.setActioncounter2(processDataDAO.getActioncounter2()+1);
+            } else {
+                processDataDAO.setActioncounter2(1);
+            }
+
+
+            ProcessDataDAO result = processDataRepo.save(processDataDAO);
+
+            model.addAttribute("successMessage","Record Successfully Saved. ");
+            model.addAttribute("processdata", result);
+
+        }
+
+
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        return "newform.html";
+    }
 
     @PostMapping ("/createNewProcessData")
     String createNewProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,

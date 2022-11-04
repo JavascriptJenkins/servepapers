@@ -12,6 +12,10 @@ public interface ProcessDataRepo extends CrudRepository<ProcessDataDAO, Long> {
 
         List<ProcessDataDAO> findAll();
         ProcessDataDAO findByFname(String fname);
+        List<ProcessDataDAO> findAllByFname(String fname);
+        List<ProcessDataDAO> findAllByLname(String lname);
+        List<ProcessDataDAO> findAllByFilenumber(Integer filenumber);
+
         ProcessDataDAO findById(Integer id);
 
 

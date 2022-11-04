@@ -53,6 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/login/systemuser").permitAll()//
         .antMatchers("/login/createSystemUser").permitAll()//
         .antMatchers("/newform/createNewProcessData/*").permitAll()//
+        .antMatchers("/newform/searchProcessData/*").permitAll()//
         .antMatchers("/login/createaccount").permitAll()//
         .antMatchers("/users/sendResetToken").permitAll()//
         .antMatchers("/users/validateUserEmail").permitAll()//
