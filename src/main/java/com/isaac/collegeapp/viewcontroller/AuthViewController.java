@@ -188,7 +188,6 @@ public class AuthViewController {
     @PostMapping ("/systemuser")
     String login(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model, HttpServletResponse response){
 
-        //controllerHelper.checkForLoggedInStudent(model, httpServletRequest); // this will check to see if a student has already loggede in
 
         String errorResult = validateLoginInfo(systemUserDAO);
 
@@ -199,6 +198,13 @@ public class AuthViewController {
 
             try{
                 Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
+
+                if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 0){
+                    System.out.println("User exists but is not active.  User needs to activate email. ");
+                    model.addAttribute("errorMessage","Unable to login. ");
+                    return "authVerifySuccess.html";
+                }
+
 
                 if(existingUser.isPresent()){
                     String token = userService.signin(
@@ -231,6 +237,124 @@ public class AuthViewController {
         }
 
         return "index.html";
+    }
+
+    @GetMapping ("/viewresetpass")
+    String viewresetpass(@RequestParam("customJwtParameter") String token, Model model, HttpServletResponse response){
+
+        String email = jwtTokenProvider.getTokenSubject(token);
+
+        SystemUserDAO systemUserDAO = new SystemUserDAO();
+        systemUserDAO.setEmail(email);
+        model.addAttribute("systemuser",systemUserDAO);
+
+        return "authActuallyResetPassword.html";
+    }
+
+    @GetMapping ("/resetpassword")
+    String resetpasswordFromEmailLink(Model model, HttpServletResponse response){
+
+        model.addAttribute("systemuser",new SystemUserDAO());
+        return "authResetPassword.html";
+    }
+
+    @PostMapping ("/actuallyresetpassword")
+    String actuallyresetpassword(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model, HttpServletResponse response){
+
+
+
+        String errorResult = validateLoginInfo(systemUserDAO);
+
+        // Validation
+        if(!errorResult.equals("success")){
+            model.addAttribute("errorMessage",errorResult);
+        } else {
+
+            try{
+                Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
+
+                if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 0){
+                    model.addAttribute("errorMessage","Unable to process request. ");
+                    return "authVerifySuccess.html";
+                } else if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 1){
+
+                        existingUser.get().setPassword(systemUserDAO.getPassword()); // set new password here
+                        systemUserRepo.save(existingUser.get());
+                }
+
+            } catch(Exception ex){
+                model.addAttribute("errorMessage","System Error");
+                System.out.println("TechVVS System Error: "+ex.getMessage());
+                return "authResetPassword.html"; // return early with error
+            }
+            model.addAttribute("successMessage","Password change success! ");
+        }
+
+        return "authVerifySuccess.html";
+    }
+
+    @PostMapping ("/resetpasswordbyemail")
+    String resetpasswordbyemail(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model, HttpServletResponse response){
+
+
+        String errorResult = "success";
+
+        if(systemUserDAO.getEmail().length() < 6
+                || systemUserDAO.getEmail().length() > 200
+                || !systemUserDAO.getEmail().contains("@")
+                || !systemUserDAO.getEmail().contains(".com")
+
+        ){
+            errorResult = "email must be between 6-200 characters and contain @ and .com";
+        } else {
+            systemUserDAO.setEmail(systemUserDAO.getEmail().trim());
+            systemUserDAO.setEmail(systemUserDAO.getEmail().replaceAll(" ",""));
+        }
+
+        // Validation
+        if(!errorResult.equals("success")){
+            model.addAttribute("errorMessage",errorResult);
+        } else {
+
+            try{
+                Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
+
+                if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 0){
+                    model.addAttribute("successMessage","If email exists in techvvs system, a link was sent to that email to reset password.  Check spam folder. ");
+                    return "authVerifySuccess.html";
+                } else if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 1){
+
+                    try{
+                        ArrayList<String> list = new ArrayList<String>(1);
+                        list.add(existingUser.get().getEmail());
+                        StringBuilder sb = new StringBuilder();
+
+                        List<Role> roles = new ArrayList<>(1);
+                        roles.add(Role.ROLE_CLIENT);
+                        String emailtoken = jwtTokenProvider.createTokenForEmailValidation(existingUser.get().getEmail(), roles);
+
+                        sb.append("Change password for your techvvs account at http://localhost:8080/login/resetpassword?customJwtParameter="+emailtoken);
+
+                        emailManager.generateAndSendEmail(sb.toString(), list, "Change password request TechVVS ServePapers account");
+                    } catch (Exception ex){
+                        System.out.println("error sending email");
+                        System.out.println(ex.getMessage());
+
+                    }
+
+                }
+
+
+
+            } catch(Exception ex){
+                model.addAttribute("errorMessage","System Error");
+                System.out.println("TechVVS System Error: "+ex.getMessage());
+                return "authResetPassword.html"; // return early with error
+            }
+            model.addAttribute("successMessage","If email exists in techvvs system, a link was sent to that email to reset password.  Check spam folder. ");
+        }
+
+        return "auth.html";
     }
 
 
@@ -290,6 +414,8 @@ public class AuthViewController {
         }
         return "success";
     }
+
+
 
     void sendValidateEmailToken(TokenVO tokenVO){
 
