@@ -14,9 +14,12 @@ import com.isaac.collegeapp.modelnonpersist.FileVO;
 import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
+import com.isaac.collegeapp.service.NewFormService;
 import com.isaac.collegeapp.service.StudentService;
 import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
@@ -32,6 +35,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RequestMapping("/newform")
 @Controller
@@ -65,7 +70,7 @@ public class NewFormViewController {
     ProcessDataRepo processDataRepo;
 
     @Autowired
-    StaticRoles staticRoles;
+    NewFormService newFormService;
 
     @Autowired
     TokenRepo tokenRepo;
@@ -95,6 +100,43 @@ public class NewFormViewController {
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", processDataDAOToBind);
         return "newform.html";
+    }
+
+    @GetMapping("/browseProcessData")
+    String browseProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,
+                             Model model,
+                             @RequestParam("customJwtParameter") String customJwtParameter,
+                             @RequestParam("page") Optional<Integer> page,
+                             @RequestParam("size") Optional<Integer> size ){
+
+
+
+
+
+        // https://www.baeldung.com/spring-data-jpa-pagination-sorting
+        //pagination
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(5);
+        Page<ProcessDataDAO> processDataDAOPage = newFormService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
+
+
+        int totalPages = processDataDAOPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(2, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }
+
+
+//        List<ProcessDataDAO> processDataDAOList = processDataRepo.findAll();
+
+
+        model.addAttribute("customJwtParameter", customJwtParameter);
+        model.addAttribute("processdata", new ProcessDataDAO());
+//        model.addAttribute("processdatas", processDataDAOList);
+        model.addAttribute("processdataPage", processDataDAOPage);
+        return "browseforms.html";
     }
 
     @GetMapping("/searchProcessData")

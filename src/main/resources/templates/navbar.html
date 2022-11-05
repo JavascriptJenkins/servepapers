@@ -6,7 +6,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="http://localhost:8080/login">TechVVS</a>
+            <a class="navbar-brand" href="http://localhost:8080/login">ServePapers TechVVS</a>
 <!--            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
 <!--                <span class="navbar-toggler-icon"></span>-->
 <!--            </button>-->
@@ -21,6 +21,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/newform/searchProcessData?customJwtParameter=__${customJwtParameter}__}">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/newform/browseProcessData?customJwtParameter=__${customJwtParameter}__}">Browse Records</a>
                     </li>
 
                 </ul>

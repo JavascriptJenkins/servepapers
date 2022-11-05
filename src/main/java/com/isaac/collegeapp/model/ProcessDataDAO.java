@@ -7,6 +7,7 @@ import com.isaac.collegeapp.security.Role;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+// todo: add soft delete
 @Entity
 @Table(name="processdata")
 public class ProcessDataDAO {

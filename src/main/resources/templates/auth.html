@@ -16,7 +16,18 @@
     <link rel="stylesheet" type="text/css" media="all" href="/css/table.css" th:href="@{/css/table.css}" />
     <!-- Bootstrap Font Icon CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script>
+        function hideform(){
+            console.log("hideform");
 
+
+            $("#maincontainer").hide();
+            $("#hiddencontainer").show();
+
+
+
+        }
+    </script>
 
 
 </head>
@@ -24,7 +35,11 @@
 
 <br>
 <br>
-    <div class="container">
+    <div id="hiddencontainer" class="container" style="display:none">
+        <div id="pleasewait" class="alert alert-primary" role="alert">Please wait while server logs in... </div>
+    </div>
+    <div id="maincontainer" class="container">
+
         <div class="alert alert-primary" role="alert" >Login to the Servepapers TechVVS system</div>
 
         <!--@RequestMapping("/studentView")-->
@@ -50,7 +65,7 @@
 
 
 
-            <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>
+            <button style="margin-top:5px;" type="submit" class="btn btn-primary" onclick="hideform()">Submit</button>
 
         </form>
 

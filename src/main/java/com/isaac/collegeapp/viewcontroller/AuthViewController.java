@@ -15,6 +15,7 @@ import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -55,7 +56,7 @@ public class AuthViewController {
     SystemUserRepo systemUserRepo;
 
     @Autowired
-    StaticRoles staticRoles;
+    Environment env;
 
     @Autowired
     TokenRepo tokenRepo;
@@ -139,7 +140,13 @@ public class AuthViewController {
         array[0] = Role.ROLE_CLIENT;
         systemUserDAO.setRoles(array); // add write access
 
-        systemUserDAO.setIsuseractive(0); // set this to 1 when email token is created
+        if("dev1".equals(env.getProperty("spring.profiles.active"))){
+            System.out.println("setting isuseractive=1 because we are in dev");
+            systemUserDAO.setIsuseractive(1); // set this to 1 when email token is created
+        } else {
+            systemUserDAO.setIsuseractive(0); // set this to 1 when email token is created
+        }
+
        // systemUserDAO.setId(0);
         systemUserDAO.setCreatetimestamp(LocalDateTime.now());
         systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
@@ -168,7 +175,12 @@ public class AuthViewController {
                 tokenVO.setTokenused(0);
 
                 // send user an email link to validate account
-                sendValidateEmailToken(tokenVO);
+                if("dev1".equals(env.getProperty("spring.profiles.active"))){
+                    System.out.println("SKIPPING SENDING EMAIL BECAUSE WE ARE IN DEV");
+                } else {
+                    sendValidateEmailToken(tokenVO);
+                }
+
                 model.addAttribute("successMessage","Check your email (and spam folder) to activate account: "+systemUserDAO.getEmail());
                 return "accountcreated.html";
 
@@ -194,6 +206,7 @@ public class AuthViewController {
         // Validation
         if(!errorResult.equals("success")){
             model.addAttribute("errorMessage",errorResult);
+            return "auth.html"; // return early with error
         } else {
 
             try{
@@ -201,6 +214,9 @@ public class AuthViewController {
 
                 if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 0){
                     System.out.println("User exists but is not active.  User needs to activate email. ");
+                    model.addAttribute("errorMessage","Unable to login. ");
+                    return "authVerifySuccess.html";
+                } else if(existingUser.isEmpty()){
                     model.addAttribute("errorMessage","Unable to login. ");
                     return "authVerifySuccess.html";
                 }
@@ -359,6 +375,10 @@ public class AuthViewController {
 
 
     String validateLoginInfo(SystemUserDAO systemUserDAO){
+
+        if(systemUserDAO.getEmail() == null || systemUserDAO.getPassword() == null || systemUserDAO.getEmail().isBlank()|| systemUserDAO.getPassword().isBlank()){
+            return "either email or password is blank";
+        }
 
 
         if(systemUserDAO.getEmail().length() < 6

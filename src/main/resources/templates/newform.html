@@ -35,7 +35,7 @@
 
 
 <!--    <div th:if="${filelist != null || (successMessage == 'Record Successfully Saved.')}">-->
-    <div th:if="${filelist != null}">
+    <div th:if="${filelist != null || processdata.createtimestamp != null}">
             <form th:action="@{/newform/createNewProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">
                 <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
                 <div class="alert alert-success" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
@@ -113,7 +113,7 @@
 
 
 
-    <div th:if="${filelist == null}">
+    <div th:if="${processdata.createtimestamp == null}">
         <form th:action="@{/newform/createNewProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">
             <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
             <div class="alert alert-success" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
