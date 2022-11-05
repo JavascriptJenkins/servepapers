@@ -211,7 +211,7 @@ public class NewFormViewController {
                 model.addAttribute("filelist", null);
             }
 
-            model.addAttribute("successMessage","Record Successfully Saved. ");
+            model.addAttribute("successMessage","Record Successfully Saved.");
             model.addAttribute("processdata", result);
         }
 
@@ -431,7 +431,7 @@ public class NewFormViewController {
                 list.add(newToken.getEmail());
                 StringBuilder sb = new StringBuilder();
 
-                sb.append("Verify your new account at https://servepapers.techvvs.io/auth/verify&token="+newToken.getToken());
+                sb.append("Verify your new account at http://localhost:8080/auth/verify&token="+newToken.getToken());
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
             } catch (Exception ex){

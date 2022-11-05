@@ -34,6 +34,7 @@
     <br>
 
 
+<!--    <div th:if="${filelist != null || (successMessage == 'Record Successfully Saved.')}">-->
     <div th:if="${filelist != null}">
             <form th:action="@{/newform/createNewProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">
                 <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
@@ -192,7 +193,7 @@
 
 
             <!-- Show list of uploaded files -->
-            <div th:if="${filelist}">
+            <div th:if="${filelist != null}">
                 <div class="alert alert-primary" role="alert" >Files Previously Uploaded</div>
                 <table class="table">
                     <thead>

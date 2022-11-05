@@ -26,8 +26,8 @@
 <br>
     <div class="container">
         <div class="alert alert-success" role="alert" >Account creation success</div>
-<!--        <h2><a href="https://servepapers.techvvs.io/login/sendvalidationemail">Request new validation email.</a></h2>-->
-        <h2><a href="https://servepapers.techvvs.io/login">Login</a></h2>
+<!--        <h2><a href="http://localhost:8080/login/sendvalidationemail">Request new validation email.</a></h2>-->
+        <h2><a href="http://localhost:8080/login">Login</a></h2>
 
         <!--@RequestMapping("/studentView")-->
         <form th:action="@{/login/createSystemUser}" th:object="${systemuser}" method="post">

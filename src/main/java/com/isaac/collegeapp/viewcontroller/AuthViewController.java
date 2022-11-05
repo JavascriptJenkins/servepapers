@@ -9,6 +9,7 @@ import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.StudentDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
+import com.isaac.collegeapp.security.JwtTokenProvider;
 import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
@@ -41,7 +42,8 @@ public class AuthViewController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
 
     @Autowired
@@ -89,61 +91,29 @@ public class AuthViewController {
     }
 
     @GetMapping("/verify")
-    String viewAuthVerify(@RequestParam("token") String token, Model model){
+    String viewAuthVerify(@RequestParam("customJwtParameter") String token, Model model){
 
+        String email = jwtTokenProvider.getTokenSubject(token);
 
-        TokenVO tokenVO = tokenRepo.findByToken(token);
+        // check if user exists
+        SystemUserDAO systemUserDAO = systemUserRepo.findByEmail(email);
 
-
-        if(checkTokenExpire(tokenVO.getCreatetimestamp()) == 1){
-            // if token is expired tell user to request another
-            return "authRequestNewToken.html";
-        }
-
-
-        SystemUserDAO systemUserDAO = systemUserRepo.findByEmail(tokenVO.getEmail());
-
-
-
-
-        if(tokenVO != null && tokenVO.getEmail() != null
-                && systemUserDAO != null
-                && tokenVO.getTokenused() == 0
-
-        ){
+        if(systemUserDAO != null && email != null){
 
             // update system user object
             systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
             systemUserDAO.setIsuseractive(1);
-           // systemUserDAO.setRoles(staticRoles.getREAD()+staticRoles.getWRITE()); // add write access
-            Role[] array = new Role[1];
-            array[0] = Role.ROLE_CLIENT;
-            systemUserDAO.setRoles(array); // add write access
 
             try{
                 systemUserRepo.save(systemUserDAO);
             } catch (Exception ex){
-                model.addAttribute("errorMessage", "System Error.  Try again or contact support: support@techvvs.io");
-
+                model.addAttribute("errorMessage", "System Error.  Try again or contact support: info@techvvs.io");
                 System.out.println("Error in viewAuthVerify: "+ex.getMessage());
                 return "authVerifySuccess.html";
             }
-
-            try{
-                tokenVO.setTokenused(1);
-                tokenVO.setUpdatedtimestamp(LocalDateTime.now());
-                tokenRepo.save(tokenVO);
-            } catch (Exception ex){
-                model.addAttribute("errorMessage", "System Error.  Try again or contact support: support@techvvs.io");
-
-                System.out.println("Error in viewAuthVerify: "+ex.getMessage());
-                return "authVerifySuccess.html";
-            }
-
 
             // add data for page display
-            model.addAttribute("token", tokenVO.getEmail());
-            model.addAttribute("successMessage", "Success activating account with email: "+tokenVO.getEmail());
+            model.addAttribute("successMessage", "Success activating account with email: "+email);
         }
         return "authVerifySuccess.html";
     }
@@ -174,8 +144,6 @@ public class AuthViewController {
         systemUserDAO.setCreatetimestamp(LocalDateTime.now());
         systemUserDAO.setUpdatedtimestamp(LocalDateTime.now());
 
-
-
         String errorResult = validateCreateSystemUser(systemUserDAO);
 
         Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
@@ -187,13 +155,6 @@ public class AuthViewController {
         } else if(existingUser.isPresent()){
             model.addAttribute("errorMessage","Cannot create account. ");
         } else{
-            // This code block will execute if there are no errors in the data that was inputed by the client
-
-            // step 1) create the new student and attach the success message
-
-            // give the user read priveledges until account is activated
-            //systemUserDAO.setRoles(staticRoles.getREAD());
-
 
             try{
 
@@ -208,7 +169,7 @@ public class AuthViewController {
 
                 // send user an email link to validate account
                 sendValidateEmailToken(tokenVO);
-                model.addAttribute("successMessage","Check your email to activate account: "+systemUserDAO.getEmail());
+                model.addAttribute("successMessage","Check your email (and spam folder) to activate account: "+systemUserDAO.getEmail());
                 return "accountcreated.html";
 
             } catch(Exception ex){
@@ -332,39 +293,35 @@ public class AuthViewController {
 
     void sendValidateEmailToken(TokenVO tokenVO){
 
-
-
         if(tokenVO.getEmail() != null &&
                 tokenVO.getEmail().contains("@")){
 
-
-            // todo: send cancel token
             TokenVO newToken = new TokenVO();
-
             //generate token and send email
             newToken.setTokenused(0);
-            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
-            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
-            newToken.setToken(String.valueOf(secureRandom.nextInt(100000)));
+            newToken.setUsermetadata(tokenVO.getEmail());
+            newToken.setEmail(tokenVO.getEmail());
+            newToken.setToken(String.valueOf(secureRandom.nextInt(100000))); // todo: make this a phone token sent over text message
             newToken.setUpdatedtimestamp(LocalDateTime.now());
             newToken.setCreatetimestamp(LocalDateTime.now());
 
 
-            //todo: send email before saving
             try{
                 ArrayList<String> list = new ArrayList<String>(1);
                 list.add(newToken.getEmail());
                 StringBuilder sb = new StringBuilder();
 
-                sb.append("Verify your new account at https://servepapers.techvvs.io/auth/verify&token="+newToken.getToken());
+                List<Role> roles = new ArrayList<>(1);
+                roles.add(Role.ROLE_CLIENT);
+                String emailtoken = jwtTokenProvider.createTokenForEmailValidation(tokenVO.getEmail(), roles);
+
+                sb.append("Verify your new account at http://localhost:8080/login/verify?customJwtParameter="+emailtoken);
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
             } catch (Exception ex){
                 System.out.println("error sending email");
                 System.out.println(ex.getMessage());
 
-            } finally{
-                tokenRepo.save(newToken);
             }
 
         }

@@ -39,17 +39,19 @@ public class UploadController {
                              RedirectAttributes attributes,
                              @RequestParam("customJwtParameter") String customJwtParameter) {
 
+        System.out.println("file upload 1");
         // check if file is empty
         if (file.isEmpty()) {
             model.addAttribute("errorMessage","Please select a file to upload.");
-
+            System.out.println("file upload 2");
             model.addAttribute("processdata", processDataDAO);
             model.addAttribute("customJwtParameter",customJwtParameter);
             return "/newform.html";
         }
-
+        System.out.println("file upload 3");
         String fileName = "";
         if(file.getOriginalFilename() != null){
+            System.out.println("file upload 4");
 //            file.getOriginalFilename() =  file.getOriginalFilename().replaceAll("-","");
             // normalize the file path
             fileName = "/"+processDataDAO.getFilenumber()+"---"+StringUtils.cleanPath(file.getOriginalFilename());
@@ -57,9 +59,13 @@ public class UploadController {
 
         // save the file on the local file system
         try {
+            System.out.println("file upload 5");
             Path path = Paths.get(UPLOAD_DIR + fileName);
+            System.out.println("file upload 6");
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("file upload 7");
         } catch (IOException e) {
+            System.out.println("file upload 8");
             e.printStackTrace();
             model.addAttribute("errorMessage","file upload failed");
             model.addAttribute("processdata", processDataDAO);
@@ -70,10 +76,10 @@ public class UploadController {
 
         // write code here to see how many files have been uploaded related to the filenumber on processdata record
 
-
+        System.out.println("file upload 9");
         List<FileVO> filelist = techvvsFileHelper.getFilesByFileNumber(processDataDAO.getFilenumber(), UPLOAD_DIR);
 
-
+        System.out.println("file upload 10");
 
 
         // return success response
@@ -81,7 +87,7 @@ public class UploadController {
         model.addAttribute("processdata", processDataDAO);
         model.addAttribute("filelist", filelist);
         model.addAttribute("customJwtParameter",customJwtParameter);
-        return "/newform.html";
+        return "newform.html";
     }
 
 }
