@@ -96,7 +96,7 @@
             </table>
             <div th:if="${processdataPage.totalPages > 0}" class="pagination"
                  th:each="pageNumber : ${pageNumbers}">
-                <a th:href="@{/newform/browseProcessData?customJwtParameter=__${customJwtParameter}__&size=__${#lists.size(processdataPage)}__&page=__${pageNumber}__}"
+                <a th:href="@{/newform/browseProcessData?customJwtParameter=__${customJwtParameter}__&size=__${#lists.size(processdataPage.content)}__&page=__${pageNumber}__}"
                    th:text=${pageNumber}
                    th:class="${pageNumber==processdataPage.number + 1} ? active"></a>
             </div>

@@ -20,6 +20,7 @@ import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
@@ -115,27 +116,37 @@ public class NewFormViewController {
 
         // https://www.baeldung.com/spring-data-jpa-pagination-sorting
         //pagination
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(5);
-        Page<ProcessDataDAO> processDataDAOPage = newFormService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
+        int currentPage = page.orElse(0);
+        int pageSize = 5;
+        Pageable pageable;
+        if(currentPage == 0){
+            pageable = PageRequest.of(0 , pageSize);
+        } else {
+            pageable = PageRequest.of(currentPage - 1, pageSize);
+        }
+
+        Page<ProcessDataDAO> pageOfProcessData = processDataRepo.findAll(pageable);
+      //  Page<ProcessDataDAO> processDataDAOPage = newFormService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
 
 
-        int totalPages = processDataDAOPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(2, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
+        int totalPages = pageOfProcessData.getTotalPages();
+
+        List<Integer> pageNumbers = new ArrayList<>();
+
+        while(totalPages > 0){
+
+            pageNumbers.add(totalPages);
+            totalPages = totalPages - 1;
         }
 
 
-//        List<ProcessDataDAO> processDataDAOList = processDataRepo.findAll();
-
-
+        model.addAttribute("pageNumbers", pageNumbers);
+        model.addAttribute("page", currentPage);
+        model.addAttribute("size", pageOfProcessData.getTotalPages());
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", new ProcessDataDAO());
-//        model.addAttribute("processdatas", processDataDAOList);
-        model.addAttribute("processdataPage", processDataDAOPage);
+       // model.addAttribute("processdatas", processDataDAOList);
+        model.addAttribute("processdataPage", pageOfProcessData);
         return "browseforms.html";
     }
 

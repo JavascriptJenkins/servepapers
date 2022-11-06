@@ -30,19 +30,21 @@ public class NewFormService {
         List<ProcessDataDAO> list;
 
         System.out.println("Initializing processdata pagination... ");
-        processdatalist = processDataRepo.findAll();
+       // processdatalist = processDataRepo.findAll(pageable);
 
-        if (processdatalist.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, processdatalist.size());
-            list = processdatalist.subList(startItem, toIndex);
-        }
+        Page<ProcessDataDAO> page = processDataRepo.findAll(pageable);
 
-        Page<ProcessDataDAO> processdataPage
-                = new PageImpl<ProcessDataDAO>(list, PageRequest.of(currentPage, pageSize), processdatalist.size());
+//        if (processdatalist.size() < startItem) {
+//            list = Collections.emptyList();
+//        } else {
+//            int toIndex = Math.min(startItem + pageSize, processdatalist.size());
+//            list = processdatalist.subList(startItem, toIndex);
+//        }
+//
+//        Page<ProcessDataDAO> processdataPage
+//                = new PageImpl<ProcessDataDAO>(list, PageRequest.of(currentPage, pageSize), processdatalist.size());
 
-        return processdataPage;
+        return page;
     }
 
 

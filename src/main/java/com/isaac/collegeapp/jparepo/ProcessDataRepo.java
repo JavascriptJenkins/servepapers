@@ -2,6 +2,8 @@ package com.isaac.collegeapp.jparepo;
 
 import com.isaac.collegeapp.model.ProcessDataDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +12,7 @@ import java.util.List;
 @Repository
 public interface ProcessDataRepo extends CrudRepository<ProcessDataDAO, Long> {
 
+        Page<ProcessDataDAO> findAll(Pageable pageable);
         List<ProcessDataDAO> findAll();
         ProcessDataDAO findByFname(String fname);
         List<ProcessDataDAO> findAllByFname(String fname);
