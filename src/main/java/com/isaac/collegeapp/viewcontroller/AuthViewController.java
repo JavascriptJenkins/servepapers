@@ -16,6 +16,7 @@ import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -81,6 +82,18 @@ public class AuthViewController {
 
         model.addAttribute("systemuser", new SystemUserDAO());
         return "error.html";
+    }
+
+    //error page displayed when nobody is logged in
+    @PostMapping("/logout")
+    String logout(Model model, @RequestParam("customJwtParameter") String token,@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO){
+
+
+        model.addAttribute("customJwtParameter","");
+        SecurityContextHolder.getContext().setAuthentication(null); // clear the internal auth
+        SecurityContextHolder.clearContext();
+        model.addAttribute("systemuser", new SystemUserDAO());
+        return "auth.html";
     }
 
     //error page displayed when nobody is logged in
