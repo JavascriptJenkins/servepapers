@@ -458,46 +458,46 @@ public class NewFormViewController {
         return "success";
     }
 
-    void sendValidateEmailToken(TokenVO tokenVO){
-
-
-
-        if(tokenVO.getEmail() != null &&
-                tokenVO.getEmail().contains("@")){
-
-
-            // todo: send cancel token
-            TokenVO newToken = new TokenVO();
-
-            //generate token and send email
-            newToken.setTokenused(0);
-            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
-            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
-            newToken.setToken(String.valueOf(secureRandom.nextInt(100000)));
-            newToken.setUpdatedtimestamp(LocalDateTime.now());
-            newToken.setCreatetimestamp(LocalDateTime.now());
-
-
-            //todo: send email before saving
-            try{
-                ArrayList<String> list = new ArrayList<String>(1);
-                list.add(newToken.getEmail());
-                StringBuilder sb = new StringBuilder();
-
-                sb.append("Verify your new account at http://localhost:8080/auth/verify&token="+newToken.getToken());
-
-                emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
-            } catch (Exception ex){
-                System.out.println("error sending email");
-                System.out.println(ex.getMessage());
-
-            } finally{
-                tokenRepo.save(newToken);
-            }
-
-        }
-
-    }
+//    void sendValidateEmailToken(TokenVO tokenVO){
+//
+//
+//
+//        if(tokenVO.getEmail() != null &&
+//                tokenVO.getEmail().contains("@")){
+//
+//
+//            // todo: send cancel token
+//            TokenVO newToken = new TokenVO();
+//
+//            //generate token and send email
+//            newToken.setTokenused(0);
+//            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
+//            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
+//            newToken.setToken(String.valueOf(secureRandom.nextInt(1000000)));
+//            newToken.setUpdatedtimestamp(LocalDateTime.now());
+//            newToken.setCreatetimestamp(LocalDateTime.now());
+//
+//
+//            //todo: send email before saving
+//            try{
+//                ArrayList<String> list = new ArrayList<String>(1);
+//                list.add(newToken.getEmail());
+//                StringBuilder sb = new StringBuilder();
+//
+//                sb.append("Verify your new account at http://localhost:8080/auth/verify&token="+newToken.getToken());
+//
+//                emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
+//            } catch (Exception ex){
+//                System.out.println("error sending email");
+//                System.out.println(ex.getMessage());
+//
+//            } finally{
+//                tokenRepo.save(newToken);
+//            }
+//
+//        }
+//
+//    }
 
 
     @GetMapping("/requestcancel")
@@ -526,59 +526,59 @@ public class NewFormViewController {
 
 
 
-    @PostMapping("/requesttoken")
-    String requesttoken(@ModelAttribute( "canceltrain" ) TokenVO tokenVO, Model model){
-
-
-        if(tokenVO.getEmail() != null &&
-                tokenVO.getEmail().contains("@")){
-
-
-            // todo: send cancel token
-            TokenVO newToken = new TokenVO();
-
-            //generate token and send email
-            newToken.setTokenused(0);
-            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
-            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
-            newToken.setToken(String.valueOf(secureRandom.nextInt(100000)));
-            newToken.setUpdatedtimestamp(LocalDateTime.now());
-            newToken.setCreatetimestamp(LocalDateTime.now());
-
-
-            //todo: send email before saving
-            try{
-                ArrayList<String> list = new ArrayList<String>(1);
-                list.add(newToken.getEmail());
-                StringBuilder sb = new StringBuilder();
-                sb.append("Here is your voting token: ");
-                sb.append(newToken.getToken());
-                sb.append(". ");
-                sb.append("Use it within 24 hours to cast votes on https://www.canceltrain.com");
-
-                emailManager.generateAndSendEmail(sb.toString(), list, "Voting token from Cancel Train!");
-            } catch (Exception ex){
-                model.addAttribute("errorMessage", "Error sending email!");
-                model.addAttribute("canceltrain", new CancelTrainVO());
-                return "token.html";
-
-            } finally{
-                tokenRepo.save(newToken);
-            }
-
-
-            model.addAttribute("successMessage", "Thank you for requesting a cancel token!  It will only be valid for 24 hours and one vote!");
-
-            model.addAttribute("canceltrain", new CancelTrainVO());
-
-
-        } else {
-            model.addAttribute("errorMessage", "Please enter a valid email address!");
-            model.addAttribute("canceltrain", new CancelTrainVO());
-        }
-
-        return "token.html";
-    }
+//    @PostMapping("/requesttoken")
+//    String requesttoken(@ModelAttribute( "canceltrain" ) TokenVO tokenVO, Model model){
+//
+//
+//        if(tokenVO.getEmail() != null &&
+//                tokenVO.getEmail().contains("@")){
+//
+//
+//            // todo: send cancel token
+//            TokenVO newToken = new TokenVO();
+//
+//            //generate token and send email
+//            newToken.setTokenused(0);
+//            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
+//            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
+//            newToken.setToken(String.valueOf(secureRandom.nextInt(1000000)));
+//            newToken.setUpdatedtimestamp(LocalDateTime.now());
+//            newToken.setCreatetimestamp(LocalDateTime.now());
+//
+//
+//            //todo: send email before saving
+//            try{
+//                ArrayList<String> list = new ArrayList<String>(1);
+//                list.add(newToken.getEmail());
+//                StringBuilder sb = new StringBuilder();
+//                sb.append("Here is your voting token: ");
+//                sb.append(newToken.getToken());
+//                sb.append(". ");
+//                sb.append("Use it within 24 hours to cast votes on https://www.canceltrain.com");
+//
+//                emailManager.generateAndSendEmail(sb.toString(), list, "Voting token from Cancel Train!");
+//            } catch (Exception ex){
+//                model.addAttribute("errorMessage", "Error sending email!");
+//                model.addAttribute("canceltrain", new CancelTrainVO());
+//                return "token.html";
+//
+//            } finally{
+//                tokenRepo.save(newToken);
+//            }
+//
+//
+//            model.addAttribute("successMessage", "Thank you for requesting a cancel token!  It will only be valid for 24 hours and one vote!");
+//
+//            model.addAttribute("canceltrain", new CancelTrainVO());
+//
+//
+//        } else {
+//            model.addAttribute("errorMessage", "Please enter a valid email address!");
+//            model.addAttribute("canceltrain", new CancelTrainVO());
+//        }
+//
+//        return "token.html";
+//    }
 
 
 

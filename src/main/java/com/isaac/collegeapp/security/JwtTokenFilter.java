@@ -56,6 +56,10 @@ public class JwtTokenFilter extends OncePerRequestFilter implements CsrfTokenRep
 
       } else if(httpServletRequest.getRequestURI().equals("/css/table.css")){
         logger.info("REQUEST FOR CSS");
+      } else if(httpServletRequest.getRequestURI().equals("/login/verifyphonetoken") && "POST".equals(httpServletRequest.getMethod())){
+          // post requests need a jwt token usually
+          logger.info("DEBUG33333333");
+
       }
     } catch (CustomException ex) {
         logger.info("Exception on JWT controller: "+ex.getMessage());

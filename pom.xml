@@ -120,6 +120,14 @@
 		</dependency>
 
 
+		<!-- Java texting api -->
+		<!-- https://mvnrepository.com/artifact/com.textmagic.sdk/textmagic-java-sdk -->
+		<dependency>
+			<groupId>com.textmagic.sdk</groupId>
+			<artifactId>textmagic-java-sdk</artifactId>
+			<version>2.0.2456</version>
+		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
 <!--		<dependency>-->
@@ -160,6 +168,33 @@
 					</filesets>
 				</configuration>
 			</plugin>
+
+
+			<!-- replace all hostname files when going to do prod build -->
+<!--			<plugin>-->
+<!--				<groupId>com.google.code.maven-replacer-plugin</groupId>-->
+<!--				<artifactId>replacer</artifactId>-->
+<!--				<version>1.5.3</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<phase>generate-sources</phase>-->
+<!--						<goals>-->
+<!--							<goal>replace</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--				<configuration>-->
+<!--					<includes>-->
+<!--						<include>src/main/java/com/isaac/collegeapp/*</include>-->
+<!--					</includes>-->
+<!--					<replacements>-->
+<!--						<replacement>-->
+<!--							<token>@http://localhost:8080@</token>-->
+<!--							<value>http://localhost:8080</value>-->
+<!--						</replacement>-->
+<!--					</replacements>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 

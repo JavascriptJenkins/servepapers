@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/login/viewresetpass").permitAll()//
         .antMatchers("/login/resetpasswordbyemail").permitAll()//
         .antMatchers("/login/actuallyresetpassword").permitAll()//
+        .antMatchers("/login/verifyphonetoken").permitAll()//
         .antMatchers("/newform/editform/**").permitAll()//
         .antMatchers("/login/verify/**").permitAll()//
         .antMatchers("/newform/createNewProcessData/*").permitAll()//

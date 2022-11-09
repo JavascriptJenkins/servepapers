@@ -9,11 +9,13 @@ import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.StudentDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
+import com.isaac.collegeapp.model.TokenDAO;
 import com.isaac.collegeapp.security.JwtTokenProvider;
 import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
+import com.isaac.collegeapp.util.TextMagicUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static java.util.Arrays.asList;
 
 @RequestMapping("/login")
 @Controller
@@ -50,6 +54,10 @@ public class AuthViewController {
 
     @Autowired
     HttpServletRequest httpServletRequest;
+
+    @Autowired
+    TextMagicUtil textMagicUtil;
+
 
 
 
@@ -102,6 +110,167 @@ public class AuthViewController {
 
         model.addAttribute("systemuser", new SystemUserDAO());
         return "newaccount.html";
+    }
+
+    // display the page for typing in the token when user clicks link on phone
+//    @GetMapping("/verifylinkphonetoken")
+//    String verifylinkphonetoken(Model model, @RequestParam("email") String email){
+//
+//        TokenDAO token = new TokenDAO();
+//        token.setUsermetadata(email);
+//        model.addAttribute("token", token);
+//        return "verifylinkphonetoken.html";
+//    }
+
+    // display the page for typing in the token
+    @GetMapping("/verifyphonetoken")
+    String verifyphonetoken(Model model, @RequestParam("email") String email){
+
+        TokenDAO token = new TokenDAO();
+        token.setUsermetadata(email);
+        model.addAttribute("tknfromcontroller", token);
+        return "verifyphonetoken.html";
+    }
+
+    // display the page for typing in the token
+    @PostMapping("/verifyphonetoken")
+    String postverifyphonetoken(Model model, @ModelAttribute( "tknfromcontroller" ) TokenDAO tokenDAO){
+
+        if(tokenDAO != null && tokenDAO.getUsermetadata() != null && tokenDAO.getToken() != null){
+
+            if(tokenDAO.getToken().length() < 5 ){
+                model.addAttribute("errorMessage", "Token must be at least characters. ");
+                model.addAttribute("tknfromcontroller", tokenDAO);
+                return "authEnterPhoneToken.html";
+            }
+
+
+            Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(tokenDAO.getUsermetadata())); // see if user exists
+
+            if(tokenDAO.getPassword() != null && tokenDAO.getPassword().length() > 1 ){
+
+
+                if(existingUser.isPresent() && passwordEncoder.matches(tokenDAO.getPassword(), existingUser.get().getPassword())){
+                    // this means passwords match
+                    System.out.println("passwords match");
+
+                } else {
+                    System.out.println("passwords do not match");
+                    model.addAttribute("tknfromcontroller", tokenDAO);
+                    model.addAttribute("errorMessage","Unable to login. ");
+                    return "authEnterPhoneToken.html";
+                }
+            } else {
+                System.out.println("passwords not in correct format");
+                model.addAttribute("tknfromcontroller", tokenDAO);
+                model.addAttribute("errorMessage","password is blank ");
+                return "authEnterPhoneToken.html";
+            }
+
+
+
+
+            TokenDAO latest;
+            List<TokenDAO> tokenlist = tokenRepo.findTop10ByUsermetadataOrderByCreatetimestampAsc(tokenDAO.getUsermetadata());
+            if(tokenlist != null && tokenlist.size() > 0){
+
+
+
+                latest = tokenlist.get(0);
+                // make sure token matches the one passed from controller
+                if(!latest.getToken().equals(tokenDAO.getToken())){
+                    // the tokens don't match then we send them back
+                    model.addAttribute("errorMessage", "Token does not match.  Make sure you are entering the correct value or try logging in again. "); // todo: add a login link here
+                    model.addAttribute("tknfromcontroller", tokenDAO);
+                    return "authEnterPhoneToken.html";
+                }
+
+
+
+
+                if(latest.getTokenused() == 1){
+                    // if token is used send them back
+                    model.addAttribute("errorMessage", "Try logging in again so a new token will be sent. "); // todo: add a login link here
+                    model.addAttribute("tknfromcontroller", tokenDAO);
+                    return "authEnterPhoneToken.html";
+
+                } else if(latest.getTokenused() == 0){
+
+
+                    latest.setUpdatedtimestamp(LocalDateTime.now());
+                    latest.setTokenused(1);
+                    // have them validate existing token
+                    System.out.println("User has valid token, setting it to used now. ");
+                    tokenRepo.save(latest);
+
+
+                    // note - user will be active if the email link has been clicked
+                    // insert jwt token minting here
+                    try{
+
+                        if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 0){
+                            model.addAttribute("tknfromcontroller", tokenDAO);
+                            System.out.println("User exists but is not active.  User needs to activate email. ");
+                            model.addAttribute("errorMessage","Unable to login. If you have created an account, check your email (and spam) for account activation link. ");
+                          //  return "authVerifySuccess.html";
+                            return "authEnterPhoneToken.html";
+                        } else if(existingUser.isEmpty()){
+                            model.addAttribute("tknfromcontroller", tokenDAO);
+                            model.addAttribute("errorMessage","Unable to login. If you have created an account, check your email (and spam) for account activation link.  ");
+                            //return "authVerifySuccess.html";
+                            return "authEnterPhoneToken.html";
+                        }
+
+
+
+                        if(existingUser.isPresent()){
+                            String token = userService.signin(
+                                    existingUser.get().getEmail(),
+                                    tokenDAO.getPassword()); // pass in plaintext password from server
+
+                            Token token1;
+                            if(token != null){
+                                System.out.println("SIGN-IN TOKEN GENERATED!!! ");
+                                token1 = new Token();
+                                token1.setToken(token);
+                                model.addAttribute("customJwtParameter",token1.getToken());
+
+                            } else {
+                                System.out.println("TOKEN IS NULL THIS IS BAD BRAH! ");
+                            }
+                        }
+
+                    } catch(Exception ex){
+                        model.addAttribute("errorMessage","System Error");
+                        System.out.println("TechVVS System Error in login: "+ex.getMessage());
+                        model.addAttribute("tknfromcontroller", tokenDAO);
+                       // return "auth.html"; // return early with error
+                        return "authEnterPhoneToken.html";
+                    }
+
+
+
+                    model.addAttribute("successMessage", "Phone token verified. ");
+                    model.addAttribute("tknfromcontroller", tokenDAO);
+                    return "index.html";
+
+                }
+            }
+
+
+
+
+
+
+        } else {
+            model.addAttribute("errorMessage", "fill out required fields");
+        }
+
+//        return "index.html";
+
+
+        model.addAttribute("tknfromcontroller", new TokenDAO());
+        return "authEnterPhoneToken.html";
     }
 
     @GetMapping("/verify")
@@ -176,6 +345,33 @@ public class AuthViewController {
             model.addAttribute("errorMessage","Cannot create account. ");
         } else{
 
+
+            // save a token value to a username and then send a text message
+            String tokenval = String.valueOf(secureRandom.nextInt(1000000));
+            String result = "";
+            try {
+                TokenDAO tokenDAO = new TokenDAO();
+                tokenDAO.setUsermetadata(systemUserDAO.getEmail());
+                tokenDAO.setToken(tokenval);
+                tokenDAO.setTokenused(0);
+                tokenDAO.setCreatetimestamp(LocalDateTime.now());
+                tokenDAO.setUpdatedtimestamp(LocalDateTime.now());
+                tokenRepo.save(tokenDAO);
+
+            } catch(Exception ex){
+                System.out.println("error inserting token into database");
+            } finally{
+                System.out.println("sending out validation text");
+                // only send the text message after everything else went smoothly
+                // todo : check result of this
+                result = textMagicUtil.sendValidationText(systemUserDAO, tokenval);
+            }
+
+
+
+
+
+
             try{
 
                 systemUserDAO.setPassword(passwordEncoder.encode(systemUserDAO.getPassword()));
@@ -209,12 +405,31 @@ public class AuthViewController {
 
         return "newaccount.html";
     }
-
+// todo: remove passing the password from this html page (auth.html)
     @PostMapping ("/systemuser")
     String login(@ModelAttribute( "systemuser" ) SystemUserDAO systemUserDAO, Model model, HttpServletResponse response){
 
 
+        Optional<SystemUserDAO> userfromdb = Optional.empty();
         String errorResult = validateLoginInfo(systemUserDAO);
+
+        // todo: add a feature to make sure login pages are not abused with ddos (maybe nginx setting)
+        // if the email is valid format, do a lookup to see if there is actually a user with this email in the system
+        if("success".equals(errorResult)){
+            userfromdb = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail()));
+            if(userfromdb.isEmpty()){
+                System.out.println("User tried to login with an email that does not exist. ");
+                errorResult = "Unable to login ";
+                model.addAttribute("errorMessage",errorResult);
+                return "auth.html"; // return early with error
+            }
+        }
+
+//        if(userfromdb.isEmpty()){
+//            // this means user was not found in the system by email lookup - send them back to auth page
+//            errorResult = "Unable to login. ";
+//        }
+
 
         // Validation
         if(!errorResult.equals("success")){
@@ -222,50 +437,42 @@ public class AuthViewController {
             return "auth.html"; // return early with error
         } else {
 
+
+            // todo: check if one hour has passed on the token
+            // pull token from database and see if 1 hour has passed and if the token is unused
             try{
-                Optional<SystemUserDAO> existingUser = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail())); // see if user exists
+                List<TokenDAO> tokenlist = tokenRepo.findTop10ByUsermetadataOrderByCreatetimestampAsc(systemUserDAO.getEmail());
+                if(tokenlist != null && tokenlist.size() > 0){
+                    TokenDAO latest = tokenlist.get(0);
+                    if(latest.getTokenused() == 1){
+                        //send a new token
+                        textMagicUtil.createAndSendNewPhoneToken(systemUserDAO);
 
-                if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 0){
-                    System.out.println("User exists but is not active.  User needs to activate email. ");
-                    model.addAttribute("errorMessage","Unable to login. ");
-                    return "authVerifySuccess.html";
-                } else if(existingUser.isEmpty()){
-                    model.addAttribute("errorMessage","Unable to login. ");
-                    return "authVerifySuccess.html";
-                }
-
-
-                if(existingUser.isPresent()){
-                    String token = userService.signin(
-                            systemUserDAO.getEmail(),
-                            systemUserDAO.getPassword());
-
-                    Token token1;
-                    if(token != null){
-                        System.out.println("SIGN-IN TOKEN GENERATED!!! ");
-                        token1 = new Token();
-                        token1.setToken(token);
-                        model.addAttribute("customJwtParameter",token1.getToken());
-                        response.setHeader("Authorization: Bearer", mapper.writeValueAsString(token1));
-
-                    } else {
-                        System.out.println("TOKEN IS NULL THIS IS BAD BRAH! ");
+                    } else if(latest.getTokenused() == 0){
+                        // have them validate existing token
+                        System.out.println("User has valid phone token not expired yet. ");
                     }
                 }
 
+
+
             } catch(Exception ex){
-                model.addAttribute("errorMessage","System Error");
-                System.out.println("TechVVS System Error in login: "+ex.getMessage());
-                return "auth.html"; // return early with error
+                System.out.println("token issue: " +ex.getMessage());
             }
 
+            // if token is expired or used, then send a new text message and insert a new token
 
-            model.addAttribute("successMessage","You are logged in: "+systemUserDAO.getEmail());
 
 
+            TokenDAO tokenDAO = new TokenDAO();
+            tokenDAO.setUsermetadata(systemUserDAO.getEmail());
+  //          model.addAttribute("successMessage","You are logged in: "+systemUserDAO.getEmail());
+            model.addAttribute("systemuser",systemUserDAO);
+            model.addAttribute("tknfromcontroller",tokenDAO);
         }
 
-        return "index.html";
+      //  return "index.html";
+        return "authEnterPhoneToken.html";
     }
 
     @GetMapping ("/viewresetpass")
@@ -292,7 +499,7 @@ public class AuthViewController {
 
 
 
-        String errorResult = validateLoginInfo(systemUserDAO);
+        String errorResult = validateActuallyResetPasswordInfo(systemUserDAO);
 
         // Validation
         if(!errorResult.equals("success")){
@@ -386,8 +593,7 @@ public class AuthViewController {
         return "auth.html";
     }
 
-
-    String validateLoginInfo(SystemUserDAO systemUserDAO){
+    String validateActuallyResetPasswordInfo(SystemUserDAO systemUserDAO){
 
         if(systemUserDAO.getEmail() == null || systemUserDAO.getPassword() == null || systemUserDAO.getEmail().isBlank()|| systemUserDAO.getPassword().isBlank()){
             return "either email or password is blank";
@@ -415,6 +621,36 @@ public class AuthViewController {
     }
 
 
+    String validateLoginInfo(SystemUserDAO systemUserDAO){
+
+        // note - not validating password in here becasue it's not needed until phonetoken/password page
+        if(systemUserDAO.getEmail() == null || systemUserDAO.getEmail().isBlank()){
+            return "email is blank";
+        }
+
+
+        if(systemUserDAO.getEmail().length() < 6
+                || systemUserDAO.getEmail().length() > 200
+                || !systemUserDAO.getEmail().contains("@")
+                || !systemUserDAO.getEmail().contains(".com")
+
+        ){
+            return "email must be between 6-200 characters and contain @ and .com";
+        } else {
+            systemUserDAO.setEmail(systemUserDAO.getEmail().trim());
+            systemUserDAO.setEmail(systemUserDAO.getEmail().replaceAll(" ",""));
+        }
+
+        // note - not validating password in here becasue it's not needed until phonetoken/password page
+
+//        if( systemUserDAO.getPassword().length() > 200
+//                || systemUserDAO.getPassword().length() < 8 ){
+//            return "password must be between 8-200 characters";
+//        }
+        return "success";
+    }
+
+
     String validateCreateSystemUser(SystemUserDAO systemUserDAO){
 
         if(systemUserDAO.getPhone().length() > 11
@@ -428,10 +664,15 @@ public class AuthViewController {
             systemUserDAO.setPhone(systemUserDAO.getPhone().replaceAll(" ",""));
         }
 
+        if(systemUserDAO.getPhone().length() == 10){
+            systemUserDAO.setPhone("1"+systemUserDAO.getPhone()); // add usa country code if phone number is 10 digits
+        }
+
         if(systemUserDAO.getEmail().length() < 6
             || systemUserDAO.getEmail().length() > 200
             || !systemUserDAO.getEmail().contains("@")
             || !systemUserDAO.getEmail().contains(".com")
+                // todo: write method here to make sure there is text between @ and .com in the string
 
         ){
             return "email must be between 6-200 characters and contain @ and .com";
@@ -460,7 +701,7 @@ public class AuthViewController {
             newToken.setTokenused(0);
             newToken.setUsermetadata(tokenVO.getEmail());
             newToken.setEmail(tokenVO.getEmail());
-            newToken.setToken(String.valueOf(secureRandom.nextInt(100000))); // todo: make this a phone token sent over text message
+            newToken.setToken(String.valueOf(secureRandom.nextInt(1000000))); // todo: make this a phone token sent over text message
             newToken.setUpdatedtimestamp(LocalDateTime.now());
             newToken.setCreatetimestamp(LocalDateTime.now());
 
@@ -514,59 +755,59 @@ public class AuthViewController {
 
 
 
-    @PostMapping("/requesttoken")
-    String requesttoken(@ModelAttribute( "canceltrain" ) TokenVO tokenVO, Model model){
-
-
-        if(tokenVO.getEmail() != null &&
-                tokenVO.getEmail().contains("@")){
-
-
-            // todo: send cancel token
-            TokenVO newToken = new TokenVO();
-
-            //generate token and send email
-            newToken.setTokenused(0);
-            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
-            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
-            newToken.setToken(String.valueOf(secureRandom.nextInt(100000)));
-            newToken.setUpdatedtimestamp(LocalDateTime.now());
-            newToken.setCreatetimestamp(LocalDateTime.now());
-
-
-            //todo: send email before saving
-            try{
-                ArrayList<String> list = new ArrayList<String>(1);
-                list.add(newToken.getEmail());
-                StringBuilder sb = new StringBuilder();
-                sb.append("Here is your voting token: ");
-                sb.append(newToken.getToken());
-                sb.append(". ");
-                sb.append("Use it within 24 hours to cast votes on https://www.canceltrain.com");
-
-                emailManager.generateAndSendEmail(sb.toString(), list, "Voting token from Cancel Train!");
-            } catch (Exception ex){
-                model.addAttribute("errorMessage", "Error sending email!");
-                model.addAttribute("canceltrain", new CancelTrainVO());
-                return "token.html";
-
-            } finally{
-                tokenRepo.save(newToken);
-            }
-
-
-            model.addAttribute("successMessage", "Thank you for requesting a cancel token!  It will only be valid for 24 hours and one vote!");
-
-            model.addAttribute("canceltrain", new CancelTrainVO());
-
-
-        } else {
-            model.addAttribute("errorMessage", "Please enter a valid email address!");
-            model.addAttribute("canceltrain", new CancelTrainVO());
-        }
-
-        return "token.html";
-    }
+//    @PostMapping("/requesttoken")
+//    String requesttoken(@ModelAttribute( "canceltrain" ) TokenVO tokenVO, Model model){
+//
+//
+//        if(tokenVO.getEmail() != null &&
+//                tokenVO.getEmail().contains("@")){
+//
+//
+//            // todo: send cancel token
+//            TokenVO newToken = new TokenVO();
+//
+//            //generate token and send email
+//            newToken.setTokenused(0);
+//            newToken.setUsermetadata(tokenVO.getEmail()); // todo: hash this email
+//            newToken.setEmail(tokenVO.getEmail()); // todo: hash this email
+//            newToken.setToken(String.valueOf(secureRandom.nextInt(1000000)));
+//            newToken.setUpdatedtimestamp(LocalDateTime.now());
+//            newToken.setCreatetimestamp(LocalDateTime.now());
+//
+//
+//            //todo: send email before saving
+//            try{
+//                ArrayList<String> list = new ArrayList<String>(1);
+//                list.add(newToken.getEmail());
+//                StringBuilder sb = new StringBuilder();
+//                sb.append("Here is your voting token: ");
+//                sb.append(newToken.getToken());
+//                sb.append(". ");
+//                sb.append("Use it within 24 hours to cast votes on https://www.canceltrain.com");
+//
+//                emailManager.generateAndSendEmail(sb.toString(), list, "Voting token from Cancel Train!");
+//            } catch (Exception ex){
+//                model.addAttribute("errorMessage", "Error sending email!");
+//                model.addAttribute("canceltrain", new CancelTrainVO());
+//                return "token.html";
+//
+//            } finally{
+//                tokenRepo.save(newToken);
+//            }
+//
+//
+//            model.addAttribute("successMessage", "Thank you for requesting a cancel token!  It will only be valid for 24 hours and one vote!");
+//
+//            model.addAttribute("canceltrain", new CancelTrainVO());
+//
+//
+//        } else {
+//            model.addAttribute("errorMessage", "Please enter a valid email address!");
+//            model.addAttribute("canceltrain", new CancelTrainVO());
+//        }
+//
+//        return "token.html";
+//    }
 
 
 

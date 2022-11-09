@@ -38,7 +38,7 @@
 <br>
 <br>
 <div id="hiddencontainer" class="container" style="display:none">
-    <div id="pleasewait" class="alert alert-primary" role="alert">Please wait while account is created... </div>
+    <div id="pleasewait" class="alert alert-primary" role="alert">Sending validation email and creating account... </div>
 </div>
     <div id="maincontainer" class="container">
         <div class="alert alert-primary" role="alert">Create a new account for the Servepapers TechVVS system</div>
@@ -65,6 +65,8 @@
 
             </div>
 
+            <!-- todo: make a secret quesiton -->
+            <!-- todo: make a second password field and write clientside and serverside validation onchange() -->
             <div class="row">
                 <div class="col" style="margin-bottom: 5px;">
                     <input type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
