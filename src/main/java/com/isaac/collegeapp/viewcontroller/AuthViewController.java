@@ -346,31 +346,6 @@ public class AuthViewController {
         } else{
 
 
-            // save a token value to a username and then send a text message
-            String tokenval = String.valueOf(secureRandom.nextInt(1000000));
-            String result = "";
-            try {
-                TokenDAO tokenDAO = new TokenDAO();
-                tokenDAO.setUsermetadata(systemUserDAO.getEmail());
-                tokenDAO.setToken(tokenval);
-                tokenDAO.setTokenused(0);
-                tokenDAO.setCreatetimestamp(LocalDateTime.now());
-                tokenDAO.setUpdatedtimestamp(LocalDateTime.now());
-                tokenRepo.save(tokenDAO);
-
-            } catch(Exception ex){
-                System.out.println("error inserting token into database");
-            } finally{
-                System.out.println("sending out validation text");
-                // only send the text message after everything else went smoothly
-                // todo : check result of this
-                result = textMagicUtil.sendValidationText(systemUserDAO, tokenval);
-            }
-
-
-
-
-
 
             try{
 
@@ -417,18 +392,30 @@ public class AuthViewController {
         // if the email is valid format, do a lookup to see if there is actually a user with this email in the system
         if("success".equals(errorResult)){
             userfromdb = Optional.ofNullable(systemUserRepo.findByEmail(systemUserDAO.getEmail()));
+
+
+
+            // if there is no user with this email reject them
             if(userfromdb.isEmpty()){
                 System.out.println("User tried to login with an email that does not exist. ");
-                errorResult = "Unable to login ";
+                errorResult = "Unable to login.  Check your email for validation link. ";
                 model.addAttribute("errorMessage",errorResult);
                 return "auth.html"; // return early with error
             }
+
+            // if user exists but is not active, tell them to check their email and validate
+            if(userfromdb.get().getIsuseractive() == 0){
+                System.out.println("User exists but is not active. ");
+                errorResult = "Unable to login. Check your email for validation link. ";
+                model.addAttribute("errorMessage",errorResult);
+                return "auth.html"; // return early with error
+            }
+
+
+
+
         }
 
-//        if(userfromdb.isEmpty()){
-//            // this means user was not found in the system by email lookup - send them back to auth page
-//            errorResult = "Unable to login. ";
-//        }
 
 
         // Validation
@@ -452,6 +439,36 @@ public class AuthViewController {
                         // have them validate existing token
                         System.out.println("User has valid phone token not expired yet. ");
                     }
+                }
+
+                // if the user has no token yet we make one and text it here
+                if(tokenlist != null && tokenlist.isEmpty()){
+
+
+                    // save a token value to a username and then send a text message
+                    String tokenval = String.valueOf(secureRandom.nextInt(1000000));
+                    String result = "";
+                    try {
+                        TokenDAO tokenDAO = new TokenDAO();
+                        tokenDAO.setUsermetadata(systemUserDAO.getEmail());
+                        tokenDAO.setToken(tokenval);
+                        tokenDAO.setTokenused(0);
+                        tokenDAO.setCreatetimestamp(LocalDateTime.now());
+                        tokenDAO.setUpdatedtimestamp(LocalDateTime.now());
+                        tokenRepo.save(tokenDAO);
+
+                    } catch(Exception ex){
+                        System.out.println("error inserting token into database");
+                    } finally{
+                        System.out.println("sending out validation text");
+                        // only send the text message after everything else went smoothly
+                        // todo : check result of this
+                        result = textMagicUtil.sendValidationText(userfromdb.get(), tokenval);
+                    }
+
+
+
+
                 }
 
 
