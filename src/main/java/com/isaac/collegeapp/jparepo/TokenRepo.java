@@ -15,7 +15,11 @@ public interface TokenRepo extends CrudRepository<TokenDAO, Long> {
     List<TokenDAO> findAllByUsermetadata(String email);
 
 
+    // this will list with oldest token at the top
     List<TokenDAO> findTop10ByUsermetadataOrderByCreatetimestampAsc(String email);
+
+    // this will list with newest token at the top
+    List<TokenDAO> findTop10ByUsermetadataOrderByCreatetimestampDesc(String email);
 
 
 

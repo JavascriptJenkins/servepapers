@@ -204,7 +204,8 @@
                     <tbody>
                     <tr th:each="file : ${filelist}">
 <!--                        <td><a th:href="@{/newform/editform?filenumber=__${processdata.filenumber}__&customJwtParameter=__${customJwtParameter}__}" th:text="${processdata.filenumber}"></a></td>-->
-                        <td th:text="${file.filename}"></td>
+<!--                        <td th:text="${file.filename}"></td>-->
+                        <td><a th:href="@{/file/download?filename=__${file.filename}__&customJwtParameter=__${customJwtParameter}__}" th:text="${file.filename}"></a></td>
                     </tr>
                     </tbody>
                 </table>

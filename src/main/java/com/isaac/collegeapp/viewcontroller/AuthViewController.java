@@ -171,7 +171,7 @@ public class AuthViewController {
 
 
             TokenDAO latest;
-            List<TokenDAO> tokenlist = tokenRepo.findTop10ByUsermetadataOrderByCreatetimestampAsc(tokenDAO.getUsermetadata());
+            List<TokenDAO> tokenlist = tokenRepo.findTop10ByUsermetadataOrderByCreatetimestampDesc(tokenDAO.getUsermetadata());
             if(tokenlist != null && tokenlist.size() > 0){
 
 
@@ -433,7 +433,7 @@ public class AuthViewController {
                     TokenDAO latest = tokenlist.get(0);
                     if(latest.getTokenused() == 1){
                         //send a new token
-                        textMagicUtil.createAndSendNewPhoneToken(systemUserDAO);
+                        textMagicUtil.createAndSendNewPhoneToken(userfromdb.get());
 
                     } else if(latest.getTokenused() == 0){
                         // have them validate existing token

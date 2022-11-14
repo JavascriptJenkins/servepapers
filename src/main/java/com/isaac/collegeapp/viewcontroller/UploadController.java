@@ -4,6 +4,7 @@ import com.isaac.collegeapp.model.ProcessDataDAO;
 import com.isaac.collegeapp.modelnonpersist.FileVO;
 import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -12,8 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +88,44 @@ public class UploadController {
         model.addAttribute("filelist", filelist);
         model.addAttribute("customJwtParameter",customJwtParameter);
         return "newform.html";
+    }
+
+    @RequestMapping(value="/download", method=RequestMethod.GET)
+    public FileSystemResource downloadFile(@RequestParam("filename") String filename, HttpServletResponse response) {
+        File file;
+//        try{
+//            file = new File(UPLOAD_DIR+filename);
+//        } catch(Exception ex){
+//            System.out.println("Could not create file to download.  This should not happen. "+ex.getMessage());
+//            return null; // i dont know what this will do on frontend
+//        }
+
+
+
+        try {
+            if(filename.contains(".pdf")){
+                response.setContentType("application/pdf");
+            }
+
+            file = new File(UPLOAD_DIR+filename);
+
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+
+
+            // get your file as InputStream
+            InputStream is = new ByteArrayInputStream(fileContent);
+
+            // copy it to response's OutputStream
+            org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+            response.flushBuffer();
+        } catch (IOException ex) {
+            System.out.println("Error writing file to output stream. Filename was: " +filename);
+            System.out.println("Error writing file to output stream. exception: " +ex.getMessage());
+            throw new RuntimeException("IOError writing file to output stream");
+        }
+
+
+        return new FileSystemResource(file);
     }
 
 }
