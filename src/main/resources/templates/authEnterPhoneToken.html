@@ -36,7 +36,9 @@
     <div id="pleasewait" class="alert alert-primary" role="alert">Please wait while server authenticates... </div>
 </div>
 <div class="container">
-    <div class="alert alert-primary" role="alert" >Enter validation token from text message, and password </div>
+    <div class="alert alert-primary" role="alert" >Enter validation token send to , and password </div>
+
+<!--    <p th:text="${tknfromcontroller.text}"></p>-->
 
     <!--@RequestMapping("/studentView")-->
     <form th:action="@{/login/verifyphonetoken}" th:object="${tknfromcontroller}" method="post">

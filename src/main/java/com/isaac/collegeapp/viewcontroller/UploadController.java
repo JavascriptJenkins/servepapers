@@ -4,7 +4,6 @@ import com.isaac.collegeapp.model.ProcessDataDAO;
 import com.isaac.collegeapp.modelnonpersist.FileVO;
 import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -15,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/file")
@@ -90,22 +88,17 @@ public class UploadController {
         return "newform.html";
     }
 
+    // note: must return null otherwise file download sucks
     @RequestMapping(value="/download", method=RequestMethod.GET)
-    public FileSystemResource downloadFile(@RequestParam("filename") String filename, HttpServletResponse response) {
+    public void downloadFile(@RequestParam("filename") String filename, HttpServletResponse response) {
         File file;
-//        try{
-//            file = new File(UPLOAD_DIR+filename);
-//        } catch(Exception ex){
-//            System.out.println("Could not create file to download.  This should not happen. "+ex.getMessage());
-//            return null; // i dont know what this will do on frontend
-//        }
-
-
 
         try {
             if(filename.contains(".pdf")){
                 response.setContentType("application/pdf");
             }
+
+            response.setHeader("Content-Disposition","attachment; filename="+filename);
 
             file = new File(UPLOAD_DIR+filename);
 
@@ -124,8 +117,7 @@ public class UploadController {
             throw new RuntimeException("IOError writing file to output stream");
         }
 
-
-        return new FileSystemResource(file);
+       // return new FileSystemResource(file);
     }
 
 }
