@@ -26,9 +26,52 @@
             $("#maincontainer").hide();
             $("#hiddencontainer").show();
 
+        }
+        function comparePasswords(){
+            console.log("comparePasswords");
+
+            var passinput = $("#passinput").val();
+            var confirmpassinput = $("#confirmpassinput").val();
+            if(passinput != confirmpassinput){
+                $("#hiddencontainerPasswordMsg").show();
+            } else {
+                $("#hiddencontainerPasswordMsg").hide();
+            }
+
 
 
         }
+
+<!--        function validatePhone(){-->
+<!--            console.log("validatePhone");-->
+
+<!--            var phoneinput = $("#phoneinput").val();-->
+<!--            if(phoneinput.contains('(' || phoneinput.contains(')') || phoneinput.contains('-')){-->
+<!--                $("#hiddencontainerPhoneMsg").show();-->
+<!--            } else {-->
+<!--                $("#hiddencontainerPhoneMsg").hide();-->
+<!--            }-->
+
+
+
+<!--        }-->
+
+<!--        function validateEmail(){-->
+<!--            console.log("validateEmail");-->
+
+<!--            var phoneinput = $("#emailinput").val();-->
+<!--            if(emailinput.contains('@') && emailinput.contains('.com')){-->
+<!--                $("#hiddencontainerEmailMsg").show();-->
+<!--            } else {-->
+<!--                $("#hiddencontainerEmailMsg").hide();-->
+<!--            }-->
+
+
+
+        }
+
+
+
     </script>
 
 
@@ -37,6 +80,15 @@
 
 <br>
 <br>
+<div id="hiddencontainerPasswordMsg" class="container" style="display:none">
+    <div id="passwordsdontmatchdiv" class="alert alert-danger" role="alert">Passwords do not match </div>
+</div>
+<!--<div id="hiddencontainerPhoneMsg" class="container" style="display:none">-->
+<!--    <div  class="alert alert-danger" role="alert">Phone number must contain no special characters ex. 6127438874 </div>-->
+<!--</div>-->
+<!--<div id="hiddencontainerEmailMsg" class="container" style="display:none">-->
+<!--    <div  class="alert alert-danger" role="alert">Email must contain @ and .com </div>-->
+<!--</div>-->
 <div id="hiddencontainer" class="container" style="display:none">
     <div id="pleasewait" class="alert alert-primary" role="alert">Sending validation email and creating account... </div>
 </div>
@@ -53,7 +105,7 @@
             <div class="row">
 
                 <div class="col" style="margin-bottom: 5px;">
-                    <input type="text" th:field="*{phone}" class="form-control" placeholder="Phone" aria-label="Phone">
+                    <input id="phoneinput" onchange="validatePhone()" type="text" th:field="*{phone}" class="form-control" placeholder="Phone" aria-label="Phone">
                 </div>
 
             </div>
@@ -69,7 +121,10 @@
             <!-- todo: make a second password field and write clientside and serverside validation onchange() -->
             <div class="row">
                 <div class="col" style="margin-bottom: 5px;">
-                    <input type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
+                    <input id="passinput" type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
+                </div>
+                <div class="col" style="margin-bottom: 5px;">
+                    <input id="confirmpassinput" onchange="comparePasswords()" type="password" th:field="*{password2}" class="form-control" placeholder="Confirm Password" aria-label="Confirm Password">
                 </div>
             </div>
 
