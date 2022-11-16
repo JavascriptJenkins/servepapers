@@ -12,7 +12,7 @@ CREATE TABLE processdata (
   lname VARCHAR(250) NOT NULL,
   age INT NOT NULL,
   actioncounter1 INT NOT NULL,
-  actioncounter2 INT NOT NULL,
+  serveattempts INT NOT NULL,
   notes VARCHAR(1000), -- Note, find out what is largest size for this notes section
   address1 VARCHAR(200) NOT NULL,
   address2 VARCHAR(100),

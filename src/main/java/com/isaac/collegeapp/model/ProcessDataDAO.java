@@ -32,11 +32,13 @@ public class ProcessDataDAO {
     @Column(name="age")
     Integer age;
 
+    // used to determine how many operations have been done (edits to the data)
     @Column(name="actioncounter1")
     Integer actioncounter1;
 
-    @Column(name="actioncounter2")
-    Integer actioncounter2;
+    // used to determine how many user declared serveattempts
+    @Column(name="serveattempts")
+    Integer serveattempts;
 
     @Column(name="notes")
     String notes;
@@ -130,12 +132,12 @@ public class ProcessDataDAO {
         this.actioncounter1 = actioncounter1;
     }
 
-    public Integer getActioncounter2() {
-        return actioncounter2;
+    public Integer getserveattempts() {
+        return serveattempts;
     }
 
-    public void setActioncounter2(Integer actioncounter2) {
-        this.actioncounter2 = actioncounter2;
+    public void setserveattempts(Integer serveattempts) {
+        this.serveattempts = serveattempts;
     }
 
     public String getNotes() {

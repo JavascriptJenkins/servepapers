@@ -42,9 +42,15 @@
 
 
 
-        <div class="col" style="margin-bottom: 5px;">
-            File Number
-            <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber" readonly>
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-sm" style="margin-bottom: 5px;">
+                <b>File Number</b>
+                <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber" readonly>
+            </div>
+            <div class="col-sm" style="margin-bottom: 5px;">
+                Serve Attempts
+                <input type="number" th:field="*{serveattempts}" class="form-control" placeholder="serveattempts" aria-label="serveattempts">
+            </div>
         </div>
 
         <div class="col" style="margin-bottom: 5px;">
@@ -131,7 +137,7 @@
         <input type="hidden" th:field="*{updatedtimestamp}">
         <input type="hidden" th:field="*{createtimestamp}">
         <input type="hidden" th:field="*{actioncounter1}">
-        <input type="hidden" th:field="*{actioncounter2}">
+        <input type="hidden" th:field="*{serveattempts}">
         <input type="hidden" th:field="*{id}">
 
         <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>
@@ -177,7 +183,7 @@
                     <input type="hidden" th:field="*{lname}">
                     <input type="hidden" th:field="*{age}">
                     <input type="hidden" th:field="*{actioncounter1}">
-                    <input type="hidden" th:field="*{actioncounter2}">
+                    <input type="hidden" th:field="*{serveattempts}">
                     <input type="hidden" th:field="*{notes}">
                     <input type="hidden" th:field="*{address1}">
                     <input type="hidden" th:field="*{address2}">

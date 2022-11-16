@@ -39,10 +39,17 @@
             <form th:action="@{/newform/createNewProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">
                 <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
                 <div class="alert alert-success" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
-                    <div class="col" style="margin-bottom: 5px;">
-                        File Number
+
+                <div class="row" style="margin-bottom: 5px;">
+                    <div class="col-sm" style="margin-bottom: 5px;">
+                        <b>File Number</b>
                         <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber" readonly>
                     </div>
+                    <div class="col-sm" style="margin-bottom: 5px;">
+                        Serve Attempts
+                        <input type="number" th:field="*{serveattempts}" class="form-control" placeholder="serveattempts" aria-label="serveattempts" readonly>
+                    </div>
+                </div>
                     <div class="col" style="margin-bottom: 5px;">
                         <input type="text" th:field="*{fname}" class="form-control" placeholder="fname" aria-label="fname" readonly>
                     </div>
@@ -117,9 +124,15 @@
         <form th:action="@{/newform/createNewProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">
             <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
             <div class="alert alert-success" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
-            <div class="col" style="margin-bottom: 5px;">
-                File Number
-                <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber" readonly>
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col-sm" style="margin-bottom: 5px;">
+                    <b>File Number</b>
+                    <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber" readonly>
+                </div>
+                <div class="col-sm" style="margin-bottom: 5px;">
+                    Serve Attempts
+                    <input type="number" th:field="*{serveattempts}" class="form-control" placeholder="serveattempts" aria-label="serveattempts">
+                </div>
             </div>
             <div class="col" style="margin-bottom: 5px;">
                 <input type="text" th:field="*{fname}" class="form-control" placeholder="fname" aria-label="fname">
@@ -223,7 +236,7 @@
                         <input type="hidden" th:field="*{lname}">
                         <input type="hidden" th:field="*{age}">
                         <input type="hidden" th:field="*{actioncounter1}">
-                        <input type="hidden" th:field="*{actioncounter2}">
+                        <input type="hidden" th:field="*{serveattempts}">
                         <input type="hidden" th:field="*{notes}">
                         <input type="hidden" th:field="*{address1}">
                         <input type="hidden" th:field="*{address2}">

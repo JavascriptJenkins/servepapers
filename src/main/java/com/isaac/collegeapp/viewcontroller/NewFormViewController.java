@@ -93,6 +93,7 @@ public class NewFormViewController {
             processDataDAOToBind = processDataDAO;
         } else {
             processDataDAOToBind = new ProcessDataDAO();
+            processDataDAOToBind.setserveattempts(0);
             processDataDAOToBind.setFilenumber(secureRandom.nextInt(10000000));
         }
 
@@ -247,11 +248,11 @@ public class NewFormViewController {
                 processDataDAO.setActioncounter1(1);
             }
 
-            if(processDataDAO.getActioncounter2() != null){
-                processDataDAO.setActioncounter2(processDataDAO.getActioncounter2()+1);
-            } else {
-                processDataDAO.setActioncounter2(1);
-            }
+//            if(processDataDAO.getserveattempts() != null){
+//                processDataDAO.setserveattempts(processDataDAO.getserveattempts()+1);
+//            } else {
+//                processDataDAO.setserveattempts(1);
+//            }
 
 
             ProcessDataDAO result = processDataRepo.save(processDataDAO);
@@ -305,11 +306,11 @@ public class NewFormViewController {
                 processDataDAO.setActioncounter1(1);
             }
 
-            if(processDataDAO.getActioncounter2() != null){
-                processDataDAO.setActioncounter2(processDataDAO.getActioncounter2()+1);
-            } else {
-                processDataDAO.setActioncounter2(1);
-            }
+//            if(processDataDAO.getserveattempts() != null){
+//                processDataDAO.setserveattempts(processDataDAO.getserveattempts()+1);
+//            } else {
+//                processDataDAO.setserveattempts(1);
+//            }
 
 
             ProcessDataDAO result = processDataRepo.save(processDataDAO);
