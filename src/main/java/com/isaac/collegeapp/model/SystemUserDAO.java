@@ -21,6 +21,9 @@ public class SystemUserDAO {
     @Column(name="password")
     String password;
 
+    @Transient
+    String password2;
+
     @Column(name="email")
     String email;
 
@@ -103,6 +106,15 @@ public class SystemUserDAO {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public String getPassword2() {
+        return password2;
+    }
+
+    public void setPassword2(String password2) {
+        this.password2 = password2;
+    }
+
 
 
 

@@ -34,8 +34,15 @@
             var confirmpassinput = $("#confirmpassinput").val();
             if(passinput != confirmpassinput){
                 $("#hiddencontainerPasswordMsg").show();
+
+                $("#disablebuttondiv").show();
+                $("#workingbuttondiv").hide();
             } else {
                 $("#hiddencontainerPasswordMsg").hide();
+
+                $("#disablebuttondiv").hide();
+                $("#workingbuttondiv").show();
+
             }
 
 
@@ -68,7 +75,7 @@
 
 
 
-        }
+<!--        }-->
 
 
 
@@ -121,17 +128,23 @@
             <!-- todo: make a second password field and write clientside and serverside validation onchange() -->
             <div class="row">
                 <div class="col" style="margin-bottom: 5px;">
-                    <input id="passinput" type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
+                    <input id="passinput" onkeyup="comparePasswords()" type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
                 </div>
                 <div class="col" style="margin-bottom: 5px;">
-                    <input id="confirmpassinput" onchange="comparePasswords()" type="password" th:field="*{password2}" class="form-control" placeholder="Confirm Password" aria-label="Confirm Password">
+                    <input id="confirmpassinput" onkeyup="comparePasswords()" type="password" th:field="*{password2}" class="form-control" placeholder="Confirm Password" aria-label="Confirm Password">
                 </div>
             </div>
 
 
 <!--            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>-->
-            <button style="margin-top:5px;" type="submit" class="btn btn-primary" onclick="hideform()">Submit</button>
 
+            <div id="disablebuttondiv" style="display:none">
+                <button style="margin-top:5px;" type="submit" class="btn btn-primary" onclick="hideform()" disabled>Submit</button>
+            </div>
+
+            <div id="workingbuttondiv" style="display:none">
+                <button style="margin-top:5px;" type="submit" class="btn btn-primary" onclick="hideform()">Submit</button>
+            </div>
         </form>
     </div>
 
