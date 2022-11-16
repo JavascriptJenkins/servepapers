@@ -37,26 +37,34 @@
     <div class="alert alert-success" role="alert" th:if="${successMessage}" th:text="${successMessage}">Success</div>
     <br>
 
-    <!-- This form will filter based on keywords passed -->
-    <form th:action="@{/newform/browseProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">
-        Enter one or more search fields to browse records
-        <div class="row">
-            <div class="col" style="margin-bottom: 5px;">
-                <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col" style="margin-bottom: 5px;">
-                <input type="text" th:field="*{fname}" class="form-control" placeholder="firstname" aria-label="firstname">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col" style="margin-bottom: 5px;">
-                <input type="text" th:field="*{lname}" class="form-control" placeholder="lastname" aria-label="lastname">
-            </div>
-        </div>
-        <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>
-    </form>
+<!--    &lt;!&ndash; todo: This form will filter based on keywords passed &ndash;&gt;-->
+<!--    <form th:action="@{/newform/searchProcessData?customJwtParameter=__${customJwtParameter}__}" th:object="${processdata}" method="post">-->
+<!--        Enter one or more search fields to browse records-->
+<!--        <div class="row">-->
+<!--            <div class="col" style="margin-bottom: 5px;">-->
+<!--                <input type="text" th:field="*{filenumber}" class="form-control" placeholder="filenumber" aria-label="filenumber">-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--            <div class="col" style="margin-bottom: 5px;">-->
+<!--                <input type="text" th:field="*{fname}" class="form-control" placeholder="firstname" aria-label="firstname">-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--            <div class="col" style="margin-bottom: 5px;">-->
+<!--                <input type="text" th:field="*{lname}" class="form-control" placeholder="lastname" aria-label="lastname">-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--            <div class="col-sm" style="margin-bottom: 5px;">-->
+<!--                <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>-->
+<!--            </div>-->
+<!--            <div class="col-sm" style="margin-bottom: 5px;">-->
+<!--                <a th:href="@{/newform/browseProcessData?customJwtParameter=__${customJwtParameter}__}">Refresh Data</a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--    </form>-->
 
     <br>
 
