@@ -1,6 +1,7 @@
 package com.isaac.collegeapp.viewcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.CharMatcher;
 import com.isaac.collegeapp.constants.StaticRoles;
 import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.h2model.CancelTrainVO;
@@ -670,12 +671,17 @@ public class AuthViewController {
 
     String validateCreateSystemUser(SystemUserDAO systemUserDAO){
 
+        if(systemUserDAO.getPhone() != null){
+            String theDigits = CharMatcher.inRange('0', '9').retainFrom(systemUserDAO.getPhone());
+            systemUserDAO.setPhone(theDigits);
+        }
+
         if(systemUserDAO.getPhone().length() > 11
                 || systemUserDAO.getPhone().length() < 10
                 || systemUserDAO.getPhone().contains("-")
                 || systemUserDAO.getPhone().contains(".")
         ){
-            return "enter 10 or 11 digit phone number with no spaces or symbols.  ex. 18884445555";
+            return "enter 10 or 11 digit phone number (special characters are ignored).  ex. 18884445555";
         } else {
             systemUserDAO.setPhone(systemUserDAO.getPhone().trim());
             systemUserDAO.setPhone(systemUserDAO.getPhone().replaceAll(" ",""));

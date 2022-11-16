@@ -28,7 +28,12 @@
 
         }
     </script>
-
+    <style>
+      .required:after {
+        content:" *";
+        color: red;
+      }
+    </style>
 
 </head>
 <body>
@@ -52,6 +57,7 @@
             <div class="row">
 
                 <div class="col">
+                    <label class="form-label required">Email</label>
                     <input style="margin-bottom: 5px;" type="text" th:field="*{email}" class="form-control" placeholder="Email" aria-label="Email">
                 </div>
             </div>

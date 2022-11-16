@@ -82,6 +82,13 @@
     </script>
 
 
+    <style>
+      .required:after {
+        content:" *";
+        color: red;
+      }
+    </style>
+
 </head>
 <body>
 
@@ -112,14 +119,16 @@
             <div class="row">
 
                 <div class="col" style="margin-bottom: 5px;">
-                    <input id="phoneinput" onchange="validatePhone()" type="text" th:field="*{phone}" class="form-control" placeholder="Phone" aria-label="Phone">
+                    <label class="form-label required">Phone</label>
+                    <input id="phoneinput" onkeyup="comparePasswords()" type="text" th:field="*{phone}" class="form-control" placeholder="Phone" aria-label="Phone">
                 </div>
 
             </div>
 
             <div class="row">
                 <div class="col" style="margin-bottom: 5px;">
-                    <input type="text" th:field="*{email}" class="form-control" placeholder="Email" aria-label="Email">
+                    <label class="form-label required">Email</label>
+                    <input type="text" onkeyup="comparePasswords()" th:field="*{email}" class="form-control" placeholder="Email" aria-label="Email">
                 </div>
 
             </div>
@@ -128,9 +137,11 @@
             <!-- todo: make a second password field and write clientside and serverside validation onchange() -->
             <div class="row">
                 <div class="col" style="margin-bottom: 5px;">
+                    <label class="form-label required">Password</label>
                     <input id="passinput" onkeyup="comparePasswords()" type="password" th:field="*{password}" class="form-control" placeholder="Password" aria-label="Password">
                 </div>
                 <div class="col" style="margin-bottom: 5px;">
+                    <label class="form-label required">Confirm Password</label>
                     <input id="confirmpassinput" onkeyup="comparePasswords()" type="password" th:field="*{password2}" class="form-control" placeholder="Confirm Password" aria-label="Confirm Password">
                 </div>
             </div>
