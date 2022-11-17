@@ -59,51 +59,50 @@
             </div>
         </div>
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">First Name</label>
-            <input type="text" th:field="*{fname}" class="form-control" placeholder="fname" aria-label="fname">
-        </div>
-
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Middle Name</label>
-            <input type="text" th:field="*{mname}" class="form-control" placeholder="mname" aria-label="mname">
-        </div>
-
-
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Last Name</label>
-            <input type="text" th:field="*{lname}" class="form-control" placeholder="lname" aria-label="lname">
-        </div>
-
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Age</label>
-            <input type="number" th:field="*{age}" class="form-control" placeholder="age" aria-label="age">
-        </div>
-
-
-        <label class="form-label required">Height feet</label>
         <div class="row" style="margin-bottom: 5px;">
-            <div class="col" style="margin-bottom: 5px;">
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">First Name</label>
+                <input type="text" th:field="*{fname}" class="form-control" placeholder="fname" aria-label="fname">
+            </div>
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label">Middle Name</label>
+                <input type="text" th:field="*{mname}" class="form-control" placeholder="mname" aria-label="mname">
+            </div>
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">Last Name</label>
+                <input type="text" th:field="*{lname}" class="form-control" placeholder="lname" aria-label="lname">
+            </div>
+        </div>
+
+
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">Age</label>
+                <input type="number" th:field="*{age}" class="form-control" placeholder="age" aria-label="age">
+            </div>
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">Height feet</label>
                 <input type="text" th:field="*{heightfeet}" class="form-control" placeholder="height feet" aria-label="heightfeet">
             </div>
-
-            <label class="form-label required">inches</label>
-            <div class="col" style="margin-bottom: 5px;">
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">inches</label>
                 <input type="text" th:field="*{heightinches}" class="form-control" placeholder="height inches" aria-label="heightinches">
             </div>
         </div>
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Hair Color</label>
-            <input type="text" th:field="*{haircolor}" class="form-control" placeholder="haircolor" aria-label="haircolor">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">Hair Color</label>
+                <input type="text" th:field="*{haircolor}" class="form-control" placeholder="haircolor" aria-label="haircolor">
+            </div>
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">Race</label>
+                <input type="text" th:field="*{race}" class="form-control" placeholder="race" aria-label="race">
+            </div>
         </div>
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Race</label>
-            <input type="text" th:field="*{race}" class="form-control" placeholder="race" aria-label="race">
-        </div>
 
-        <div class="col" style="margin-bottom: 5px;">
+        <div class="col-md-3" style="margin-bottom: 5px;">
             <label class="form-label required">Phone</label>
             <input type="text" th:field="*{phone}" class="form-control" placeholder="phone" aria-label="phone">
         </div>
@@ -112,29 +111,40 @@
         <br>
         <div class="alert alert-info" role="alert" >Address</div>
         <br>
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Address1</label>
-            <input type="text" th:field="*{address1}" class="form-control" placeholder="address1" aria-label="address1">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label required">Address1</label>
+                <input type="text" th:field="*{address1}" class="form-control" placeholder="address1" aria-label="address1">
+            </div>
+            <div class="col-md-4" style="margin-bottom: 5px;">
+                <label class="form-label">Address2</label>
+                <input type="text" th:field="*{address2}" class="form-control" placeholder="address2" aria-label="address2">
+            </div>
         </div>
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label">Address2</label>
-            <input type="text" th:field="*{address2}" class="form-control" placeholder="address2" aria-label="address2">
-        </div>
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col" style="margin-bottom: 5px;">
+                <label class="form-label required">City</label>
+                <input type="text" th:field="*{city}" class="form-control" placeholder="city" aria-label="city">
+            </div>
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">City</label>
-            <input type="text" th:field="*{city}" class="form-control" placeholder="city" aria-label="city">
-        </div>
+            <!-- todo: replace the state field on here and on edit form page with dropdown containing all the states -->
+            <div class="col" style="margin-bottom: 5px;">
+                <label class="form-label required">State</label>
+                <input type="text" th:field="*{state}" class="form-control" placeholder="state" aria-label="state">
+            </div>
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">State</label>
-            <input type="text" th:field="*{state}" class="form-control" placeholder="state" aria-label="state">
-        </div>
+            <!--            <div class="col" style="margin-bottom: 5px;">-->
+            <!--                <select class="form-select" id="validationDefault04" required>-->
+            <!--                    <option selected disabled value="">Choose...</option>-->
+            <!--                    <option>...</option>-->
+            <!--                </select>-->
+            <!--            </div>-->
 
-        <div class="col" style="margin-bottom: 5px;">
-            <label class="form-label required">Zipcode</label>
-            <input type="text" th:field="*{zipcode}" class="form-control" placeholder="zipcode" aria-label="zipcode">
+            <div class="col" style="margin-bottom: 5px;">
+                <label class="form-label required">Zipcode</label>
+                <input type="text" th:field="*{zipcode}" class="form-control" placeholder="zipcode" aria-label="zipcode">
+            </div>
         </div>
 
 
@@ -157,7 +167,7 @@
         <input type="hidden" th:field="*{serveattempts}">
         <input type="hidden" th:field="*{id}">
 
-        <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit</button>
+        <button style="margin-top:5px;" type="submit" class="btn btn-primary">Submit Edit</button>
 
 
 
