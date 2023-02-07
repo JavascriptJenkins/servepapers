@@ -42,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .apply(new JwtTokenFilterConfigurer(jwtTokenProvider))
                             .and()
 
+
             .csrf()
 
 //            .csrfTokenRepository(jwtCsrfTokenRepository)
@@ -52,9 +53,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/css/table.css").permitAll()//
         .antMatchers("/dashboard/index/*").permitAll()//
         .antMatchers("/login/logout").permitAll()//
+//        .antMatchers("/file/download/**").permitAll() // note: will be checking jwt for download on the controller
+//        .antMatchers("/file/download/*").permitAll() // note: will be checking jwt for download on the controller
+//        .antMatchers("/file/download").permitAll() // note: will be checking jwt for download on the controller
+//        .antMatchers("/file/upload/**").permitAll() //note: will be checking jwt for download on the controller
+//        .antMatchers("/file/upload/*").permitAll() //note: will be checking jwt for download on the controller
+//        .antMatchers("/file/upload").permitAll() //note: will be checking jwt for download on the controller
         .antMatchers("/login/systemuser").permitAll()//
         .antMatchers("/login/createSystemUser").permitAll()//
+        .antMatchers("/testdata/makedev").permitAll()//
         .antMatchers("/login/resetpassword").permitAll()//
+        // .antMatchers("/customer/pipeline").permitAll()//
         .antMatchers("/login/viewresetpass").permitAll()//
         .antMatchers("/login/resetpasswordbyemail").permitAll()//
         .antMatchers("/login/actuallyresetpassword").permitAll()//
@@ -72,8 +81,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/paypal/paypal").permitAll()//
         .antMatchers("/paypal/*").permitAll()//
         .antMatchers("/h2-console/**/**").permitAll()
+
+
         // Disallow everything else..
         .anyRequest().authenticated()
+
 
 
     //.cors().configurationSource(corsConfigurationSource())
@@ -102,6 +114,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
         .and()
         .ignoring()
+        .antMatchers("/customer/pipeline")
         .antMatchers("/h2-console/**/**");;
   }
 
@@ -116,6 +129,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public AuthenticationManager authenticationManagerBean() throws Exception {
     return super.authenticationManagerBean();
   }
+
 
 
 }
