@@ -88,9 +88,63 @@ public class UploadController {
         return "newform.html";
     }
 
+    @PostMapping("/upload2")
+    public String uploadFile2(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,
+                             Model model,
+                             @RequestParam("file") MultipartFile file,
+                             RedirectAttributes attributes,
+                             @RequestParam("customJwtParameter") String customJwtParameter) {
+
+        System.out.println("file upload 1");
+        // check if file is empty
+        if (file.isEmpty()) {
+            model.addAttribute("errorMessage","Please select a file to upload.");
+            model.addAttribute("processdata", processDataDAO);
+            model.addAttribute("customJwtParameter",customJwtParameter);
+            return "/editforms.html";
+        }
+        String fileName = "";
+        if(file.getOriginalFilename() != null){
+//            file.getOriginalFilename() =  file.getOriginalFilename().replaceAll("-","");
+            // normalize the file path
+            fileName = "/"+processDataDAO.getFilenumber()+"---"+StringUtils.cleanPath(file.getOriginalFilename());
+        }
+
+        // save the file on the local file system
+        try {
+            Path path = Paths.get(UPLOAD_DIR + fileName);
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            model.addAttribute("errorMessage","file upload failed");
+            model.addAttribute("processdata", processDataDAO);
+            model.addAttribute("customJwtParameter",customJwtParameter);
+            return "editforms.html";
+        }
+
+
+        // write code here to see how many files have been uploaded related to the filenumber on processdata record
+
+        List<FileVO> filelist = techvvsFileHelper.getFilesByFileNumber(processDataDAO.getFilenumber(), UPLOAD_DIR);
+
+
+
+        // return success response
+        model.addAttribute("successMessage","You successfully uploaded " + fileName + '!');
+        model.addAttribute("processdata", processDataDAO);
+        model.addAttribute("filelist", filelist);
+        model.addAttribute("customJwtParameter",customJwtParameter);
+        return "editforms.html";
+    }
+
     // note: must return null otherwise file download sucks
     @RequestMapping(value="/download", method=RequestMethod.GET)
-    public void downloadFile(@RequestParam("filename") String filename, HttpServletResponse response) {
+    public void downloadFile(@RequestParam("filename") String filename,
+                                       HttpServletResponse response,
+                                       @RequestParam("customJwtParameter") String customJwtParameter,
+                                       Model model,
+                                        @ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO
+                               ) {
         File file;
 
         try {
@@ -108,16 +162,31 @@ public class UploadController {
             // get your file as InputStream
             InputStream is = new ByteArrayInputStream(fileContent);
 
+
+            model.addAttribute("customJwtParameter",customJwtParameter);
+            System.out.println("has value: "+processDataDAO);
+
+            model.addAttribute("customJwtParameter",customJwtParameter);
+            model.addAttribute("processdata",processDataDAO);
+            model.addAttribute("disableupload","true");
+            List<FileVO> filelist = techvvsFileHelper.getFilesByFileNumber(processDataDAO.getFilenumber(), UPLOAD_DIR);
+            model.addAttribute("filelist",filelist);
+
+
             // copy it to response's OutputStream
             org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
             response.flushBuffer();
+//            response.getOutputStream().flush();
+//            response.getOutputStream().close();
         } catch (IOException ex) {
             System.out.println("Error writing file to output stream. Filename was: " +filename);
             System.out.println("Error writing file to output stream. exception: " +ex.getMessage());
+            model.addAttribute("customJwtParameter",customJwtParameter);
             throw new RuntimeException("IOError writing file to output stream");
         }
 
-       // return new FileSystemResource(file);
+
+//        return "redirect: /newform/viewNewForm";
     }
 
 }

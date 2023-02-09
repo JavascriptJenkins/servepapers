@@ -345,13 +345,13 @@ public class NewFormViewController {
             return "last name must be between 1-250 characters. ";
         }
 
-        if(
-                processDataDAO.getMname() != null &&
-                (processDataDAO.getMname().length() > 250
-                || processDataDAO.getMname().length() < 1)
-        ){
-            return "middle name must be between 1-250 characters. ";
-        }
+//        if(
+//                processDataDAO.getMname() != null &&
+//                (processDataDAO.getMname().length() > 250
+//                || processDataDAO.getMname().length() < 1)
+//        ){
+//            return "middle name must be between 1-250 characters. ";
+//        }
 
 
         // get all the integers out of the phone string (guava is faster than regex)

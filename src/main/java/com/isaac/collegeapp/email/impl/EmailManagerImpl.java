@@ -53,7 +53,7 @@ public class EmailManagerImpl implements EmailManager {
         // Enter your correct gmail UserID and Password
         // if you have 2FA enabled then provide App Specific Password
         // todo: change this password when going to prod
-        transport.connect("smtp.gmail.com", "info@techvvs.io", "Support1$");
+        transport.connect("smtp.gmail.com", "admin@techvvs.io", "Newmoney1$");
         transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
         transport.close();
     }

@@ -1,18 +1,21 @@
 package com.isaac.collegeapp.viewcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.google.common.base.CharMatcher;
 import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.jparepo.ProcessDataRepo;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.ProcessDataDAO;
+import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.modelnonpersist.FileVO;
 import com.isaac.collegeapp.modelnonpersist.CustPipelineVO;
 
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.NewFormService;
 import com.isaac.collegeapp.service.StudentService;
+import com.isaac.collegeapp.service.SystemAccountService;
 import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -80,27 +83,45 @@ public class CustomerPipelineController {
     @Autowired
     EmailManager emailManager;
 
+    @Autowired
+    SystemAccountService systemAccountService;
+
 
     // no authentication needed for this method because it's running on same local server
-    @CrossOrigin(origins = "http://localhost:3000")
-    @PostMapping("/pipeline")
+    @CrossOrigin(origins = {"http://localhost:3000","https://techvvs.io:3000","https://techvvs.io"})
+    @PostMapping(value = "/pipeline", produces = { "application/json" })
     String searchProcessDataPost(@RequestBody String data){
 
         System.out.println("coming from react /pipeline: "+data);
 
-
+        String jsonstring = "error"; // todo: make this a josn object
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
         try{
 
+            mapper.registerModule(new JSR310Module());
         // This is parsing correctly from react data now
        JsonNode node = mapper.readTree(data);
-       System.out.println("noe: " + node.get("name"));
-       System.out.println("value: " + node.get("name").get("value"));
+
+       // we will use this info to make a new customer account
+       String name = String.valueOf(node.get("name").get("value"));
+       String email = String.valueOf(node.get("email").get("value"));
+       String project = String.valueOf(node.get("project").get("value"));
 
 
+        SystemUserDAO systemUserDAO = new SystemUserDAO();
+            systemUserDAO.setName(name);
+            systemUserDAO.setEmail(email);
+            systemUserDAO.setProject(project);
 
-       // parse out the 3 values from the form input json
+        systemUserDAO = systemAccountService.buildSystemUserFromContactForm(systemUserDAO);
+
+        jsonstring = mapper.writeValueAsString(systemUserDAO);
+
+
+            // mapper.readValue(systemUserDAO,SystemUserDAO.class);
+
+
 
         // make a new systemuserobject and insert into database(take code from other controller for this)
 
@@ -108,12 +129,13 @@ public class CustomerPipelineController {
 
 
         } catch(Exception exception){
-                         System.out.println("exe with json: " + exception);
+             System.out.println("problem on the server processing contact form submission: " + exception);
 
+             return "problem on the server processing contact form submission";
         }
-    
 
-        return data;
+
+        return jsonstring;
     }
 
 

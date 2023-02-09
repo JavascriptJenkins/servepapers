@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Collections;
 
@@ -63,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/login/createSystemUser").permitAll()//
         .antMatchers("/testdata/makedev").permitAll()//
         .antMatchers("/login/resetpassword").permitAll()//
-        // .antMatchers("/customer/pipeline").permitAll()//
+         .antMatchers("/customer/pipeline").permitAll()//
         .antMatchers("/login/viewresetpass").permitAll()//
         .antMatchers("/login/resetpasswordbyemail").permitAll()//
         .antMatchers("/login/actuallyresetpassword").permitAll()//
@@ -128,6 +130,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public AuthenticationManager authenticationManagerBean() throws Exception {
     return super.authenticationManagerBean();
+  }
+
+  @Bean
+  public WebMvcConfigurer corsConfigurer() {
+    return new WebMvcConfigurer() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/customer/pipeline").allowedOrigins("https://techvss.io:8080");
+        registry.addMapping("/customer/pipeline").allowedOrigins("https://techvss.io:3000");
+        registry.addMapping("/customer/pipeline").allowedOrigins("http://localhost:3000");
+      }
+    };
   }
 
 

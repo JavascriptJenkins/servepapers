@@ -4,6 +4,7 @@ package com.isaac.collegeapp.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.isaac.collegeapp.security.Role;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -20,6 +21,14 @@ public class SystemUserDAO {
 
     @Column(name="password")
     String password;
+
+    @Nullable
+    @Column(name="name")
+    String name;
+
+    @Nullable
+    @Column(name="project")
+    String project;
 
     @Transient
     String password2;
@@ -115,6 +124,21 @@ public class SystemUserDAO {
         this.password2 = password2;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(@Nullable String project) {
+        this.project = project;
+    }
 
 
 

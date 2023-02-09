@@ -227,9 +227,22 @@
                     <input type="hidden" th:field="*{createtimestamp}">
                 </div>
                 <br>
-                <button type="submit" class="btn btn-primary">Upload File</button>
+
+                <div th:if="${disableupload}">
+                    <button type="submit" disabled="disabled" class="btn btn-primary">Upload File</button>
+                    <td><a th:href="@{/newform/editform?filenumber=__${processdata.filenumber}__&customJwtParameter=__${customJwtParameter}__}" th:text="Upload More Files"></a></td>
+                </div>
+
+                <!-- if it is first download then it is ok.  second download will throw 403 is upload is performed right after  -->
+                <div th:if="${disableupload == null}">
+                    <button type="submit" class="btn btn-primary">Upload File</button>
+                </div>
+
+
+
             </form>
         </div>
+
 
 
 

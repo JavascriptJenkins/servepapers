@@ -23,13 +23,9 @@ public class TechvvsFileHelper {
             if (directoryListing != null) {
                 for (File child : directoryListing) {
                     // Do something with child
-                    System.out.println("listing files");
                     child.getAbsoluteFile();
-                    System.out.println("listing files 2");
                     child.getAbsoluteFile().getName();
-                    System.out.println("listing files 3");
                     if(child.getAbsoluteFile().getName().contains(String.valueOf(filenumber))){
-                        System.out.println("listing files 4");
                         FileVO fileVO = new FileVO();
                         fileVO.setFilename(child.getAbsoluteFile().getName());
                         filelist.add(fileVO); // add it to a nonpersisted list that will be displayed on the ui
