@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 
+//todo: post to different domain altohether ex.   api.techvvs.io/customer/pipeline in nginx
+@CrossOrigin(origins = {"http://localhost:3000","https://techvvs.io:3000","https://techvvs.io","https://techvvs.io","https://techvvs.io:3000"})
 @RequestMapping("/customer")
 @RestController // returns json data, not views
 public class CustomerPipelineController {
@@ -88,7 +90,7 @@ public class CustomerPipelineController {
 
 
     // no authentication needed for this method because it's running on same local server
-    @CrossOrigin(origins = {"http://localhost:3000","https://techvvs.io:3000","https://techvvs.io"})
+    @CrossOrigin(origins = {"http://localhost:3000","https://techvvs.io:3000","https://techvvs.io","https://techvvs.io","https://techvvs.io:3000"})
     @PostMapping(value = "/pipeline", produces = { "application/json" })
     String searchProcessDataPost(@RequestBody String data){
 

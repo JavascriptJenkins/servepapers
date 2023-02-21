@@ -55,6 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/css/table.css").permitAll()//
         .antMatchers("/dashboard/index/*").permitAll()//
         .antMatchers("/login/logout").permitAll()//
+             .antMatchers("/customer/pipeline").permitAll()
 //        .antMatchers("/file/download/**").permitAll() // note: will be checking jwt for download on the controller
 //        .antMatchers("/file/download/*").permitAll() // note: will be checking jwt for download on the controller
 //        .antMatchers("/file/download").permitAll() // note: will be checking jwt for download on the controller
@@ -116,8 +117,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
         .and()
         .ignoring()
-        .antMatchers("/customer/pipeline")
+            .antMatchers("/customer/pipeline")
+      //  .antMatchers("/customer/pipeline/*")
         .antMatchers("/h2-console/**/**");;
+
   }
 
   @Bean
@@ -137,9 +140,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new WebMvcConfigurer() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/customer/pipeline").allowedOrigins("https://techvss.io:8080");
-        registry.addMapping("/customer/pipeline").allowedOrigins("https://techvss.io:3000");
-        registry.addMapping("/customer/pipeline").allowedOrigins("http://localhost:3000");
+        registry.addMapping("/customer/pipeline").allowedOrigins("https://techvvs.io");
+        registry.addMapping("/customer/pipeline").allowedOrigins("https://techvvs.io:3000");
+        registry.addMapping("/customer/pipeline").allowedOrigins("http://techvvs:3000");
       }
     };
   }

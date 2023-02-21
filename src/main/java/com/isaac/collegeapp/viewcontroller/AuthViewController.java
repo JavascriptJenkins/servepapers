@@ -587,7 +587,7 @@ public class AuthViewController {
                         roles.add(Role.ROLE_CLIENT);
                         String emailtoken = jwtTokenProvider.createTokenForEmailValidation(existingUser.get().getEmail(), roles);
 
-                        sb.append("Change password for your techvvs account at https://techvvs.io/login/resetpassword?customJwtParameter="+emailtoken);
+                        sb.append("Change password for your techvvs account at https://servepapers.techvvs.io/login/resetpassword?customJwtParameter="+emailtoken);
 
                         emailManager.generateAndSendEmail(sb.toString(), list, "Change password request TechVVS ServePapers account");
                     } catch (Exception ex){
@@ -738,7 +738,7 @@ public class AuthViewController {
                 roles.add(Role.ROLE_CLIENT);
                 String emailtoken = jwtTokenProvider.createTokenForEmailValidation(tokenVO.getEmail(), roles);
 
-                sb.append("Verify your new account at https://techvvs.io/login/verify?customJwtParameter="+emailtoken);
+                sb.append("Verify your new account at https://servepapers.techvvs.io/login/verify?customJwtParameter="+emailtoken);
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "Validate email for new TechVVS ServePapers account");
             } catch (Exception ex){

@@ -34,6 +34,7 @@ ps aux | grep java
 
 nginx
 
+### here starts it
 su -c "nohup java -jar collegeapp-0.0.1-SNAPSHOT.jar &" -s /bin/sh root
 su -c "nohup serve -s build &" -s /bin/sh root
 
@@ -55,7 +56,7 @@ chmod +x redeploy.sh
 sudo apt update
 sudo apt install nodejs npm
 
-
+sudo systemctl stop nginx
 
 
 server {

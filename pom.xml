@@ -218,8 +218,8 @@
 <!--					</includes>-->
 <!--					<replacements>-->
 <!--						<replacement>-->
-<!--							<token>@https://techvvs.io@</token>-->
-<!--							<value>https://techvvs.io</value>-->
+<!--							<token>@https://servepapers.techvvs.io@</token>-->
+<!--							<value>https://servepapers.techvvs.io</value>-->
 <!--						</replacement>-->
 <!--					</replacements>-->
 <!--				</configuration>-->
