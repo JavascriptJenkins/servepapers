@@ -7,8 +7,6 @@ import com.isaac.collegeapp.security.Role;
 import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Table(name="systemuser")

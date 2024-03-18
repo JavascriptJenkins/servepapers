@@ -1,12 +1,12 @@
 package com.isaac.collegeapp.service;
 
 import com.google.common.base.CharMatcher;
-import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.h2model.TokenVO;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.security.JwtTokenProvider;
 import com.isaac.collegeapp.security.Role;
+import com.isaac.collegeapp.util.SendgridEmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +15,6 @@ import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Component
 public class SystemAccountService {
@@ -34,7 +32,7 @@ public class SystemAccountService {
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    EmailManager emailManager;
+    SendgridEmailUtil emailManager;
 
     SecureRandom secureRandom = new SecureRandom();
 

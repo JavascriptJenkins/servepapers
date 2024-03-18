@@ -24,6 +24,6 @@ https://servepapers.techvvs.io:8080/customer/pipeline
 curl --header "Content-Type: application/json" \
 --request POST \
 --data '{"name":{"value":"fff"},"email":{"value":"unwoundcracker@gmail.com"},"project":{"value":"ddddd"}}' \
-http://localhost:8080/customer/pipeline
+https://servepapers.techvvs.io/customer/pipeline
 
 {"name":{"value":"fff"},"email":{"value":"unwoundcracker@gmail.com"},"project":{"value":"ddddd"}}

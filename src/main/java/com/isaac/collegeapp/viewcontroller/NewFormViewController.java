@@ -100,6 +100,7 @@ public class NewFormViewController {
 
 
 
+        model.addAttribute("disableupload","true"); // disable uploading a file until we actually have a record submitted successfully
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", processDataDAOToBind);
         return "newform.html";
@@ -293,6 +294,7 @@ public class NewFormViewController {
 
         // Validation
         if(!errorResult.equals("success")){
+            model.addAttribute("disableupload","true"); // if there is an error submitting the new form we keep this disabled
             model.addAttribute("errorMessage",errorResult);
         } else {
 

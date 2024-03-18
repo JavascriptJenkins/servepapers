@@ -2,13 +2,10 @@ package com.isaac.collegeapp.viewcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CharMatcher;
-import com.isaac.collegeapp.constants.StaticRoles;
-import com.isaac.collegeapp.email.EmailManager;
 import com.isaac.collegeapp.h2model.CancelTrainVO;
 import com.isaac.collegeapp.h2model.TokenVO;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
-import com.isaac.collegeapp.model.StudentDAO;
 import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.model.TokenDAO;
 import com.isaac.collegeapp.security.JwtTokenProvider;
@@ -16,7 +13,9 @@ import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.StudentService;
-import com.isaac.collegeapp.util.TextMagicUtil;
+
+import com.isaac.collegeapp.util.SendgridEmailUtil;
+import com.isaac.collegeapp.util.TwilioTextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,14 +24,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static java.util.Arrays.asList;
 
 @RequestMapping("/login")
 @Controller
@@ -57,7 +54,7 @@ public class AuthViewController {
     HttpServletRequest httpServletRequest;
 
     @Autowired
-    TextMagicUtil textMagicUtil;
+    TwilioTextUtil textMagicUtil;
 
 
 
@@ -74,7 +71,7 @@ public class AuthViewController {
     SecureRandom secureRandom = new SecureRandom();
 
     @Autowired
-    EmailManager emailManager;
+    SendgridEmailUtil emailManager;
 
 
     //default home mapping
@@ -430,9 +427,11 @@ public class AuthViewController {
             // pull token from database and see if 1 hour has passed and if the token is unused
             try{
                 List<TokenDAO> tokenlist = tokenRepo.findTop10ByUsermetadataOrderByCreatetimestampAsc(systemUserDAO.getEmail());
+                System.out.println("Size of Token list. "+String.valueOf(tokenlist.size()));
                 if(tokenlist != null && tokenlist.size() > 0){
                     TokenDAO latest = tokenlist.get(0);
                     if(latest.getTokenused() == 1){
+                        System.out.println("User has token that is already used. Making a new one now. ");
                         //send a new token
                         textMagicUtil.createAndSendNewPhoneToken(userfromdb.get());
 
@@ -441,6 +440,8 @@ public class AuthViewController {
                         System.out.println("User has valid phone token not expired yet. ");
                     }
                 }
+
+                // upon account creation we are putting a token in the database
 
                 // if the user has no token yet we make one and text it here
                 if(tokenlist != null && tokenlist.isEmpty()){
@@ -457,6 +458,7 @@ public class AuthViewController {
                         tokenDAO.setCreatetimestamp(LocalDateTime.now());
                         tokenDAO.setUpdatedtimestamp(LocalDateTime.now());
                         tokenRepo.save(tokenDAO);
+                        System.out.println("new token saved successfully for user with no existing token. ");
 
                     } catch(Exception ex){
                         System.out.println("error inserting token into database");
@@ -468,9 +470,24 @@ public class AuthViewController {
                     }
 
 
+                    // If we have 1 token in the database for a user, and that token is NOT used, do this
+                    if(tokenlist != null && tokenlist.size() == 1){
+                        TokenDAO latest = tokenlist.get(0);
+                        if(latest.getTokenused() == 1){
+                            System.out.println("User has token that is already used. Making a new one now. ");
+                            //send a new token
+                            textMagicUtil.createAndSendNewPhoneToken(userfromdb.get());
+
+                        } else if(latest.getTokenused() == 0){
+                            // have them validate existing token
+                            System.out.println("User has valid phone token not expired yet. ");
+                        }
+                    }
 
 
                 }
+
+
 
 
 
@@ -532,7 +549,7 @@ public class AuthViewController {
                     return "authVerifySuccess.html";
                 } else if(existingUser.isPresent() && existingUser.get().getIsuseractive() == 1){
 
-                        existingUser.get().setPassword(systemUserDAO.getPassword()); // set new password here
+                        existingUser.get().setPassword(passwordEncoder.encode(systemUserDAO.getPassword())); // set new password here
                         systemUserRepo.save(existingUser.get());
                 }
 
@@ -587,7 +604,7 @@ public class AuthViewController {
                         roles.add(Role.ROLE_CLIENT);
                         String emailtoken = jwtTokenProvider.createTokenForEmailValidation(existingUser.get().getEmail(), roles);
 
-                        sb.append("Change password for your techvvs account at https://servepapers.techvvs.io/login/resetpassword?customJwtParameter="+emailtoken);
+                        sb.append("Change password for your techvvs account at https://servepapers.techvvs.io/login/viewresetpass?customJwtParameter="+emailtoken);
 
                         emailManager.generateAndSendEmail(sb.toString(), list, "Change password request TechVVS ServePapers account");
                     } catch (Exception ex){

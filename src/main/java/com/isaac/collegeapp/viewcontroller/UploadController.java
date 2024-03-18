@@ -137,6 +137,7 @@ public class UploadController {
         return "editforms.html";
     }
 
+    // TODO: make getting a download link popup so people click a link in a popup box
     // note: must return null otherwise file download sucks
     @RequestMapping(value="/download", method=RequestMethod.GET)
     public void downloadFile(@RequestParam("filename") String filename,

@@ -302,11 +302,22 @@
 
 
             <div style="margin-bottom: 5px;" class="mx-auto">
+
                 <div class="alert alert-info" role="alert" >Upload a file</div>
                 <!-- pass the processdata object to the upload file controller to get the correct ID to save it under -->
                 <form method="post" th:object="${processdata}" th:action="@{/file/upload?customJwtParameter=__${customJwtParameter}__}" enctype="multipart/form-data">
                     <div class="form-group">
-                        <input type="file" name="file" class="form-control-file">
+
+                        <div th:if="${disableupload}">
+                            <input type="file" disabled="disabled" name="file" class="form-control-file">
+                        </div>
+
+                        <div th:if="${disableupload == null}">
+                            <input type="file" name="file" class="form-control-file">
+                        </div>
+
+
+
                         <!-- pass all these hidden attributes with so the data stays on page after uploading the file -->
                         <input type="hidden" th:field="*{filenumber}">
                         <input type="hidden" th:field="*{fname}">
@@ -331,7 +342,20 @@
                         <input type="hidden" th:field="*{createtimestamp}">
                     </div>
                     <br>
-                    <button type="submit" class="btn btn-primary">Upload File</button>
+
+
+                    <div th:if="${disableupload}">
+
+                        <button type="submit" disabled="disabled" class="btn btn-primary">Upload File</button>
+                    </div>
+
+                    <!-- if it is first download then it is ok.  second download will throw 403 is upload is performed right after  -->
+                    <div th:if="${disableupload == null}">
+                        <button type="submit" class="btn btn-primary">Upload File</button>
+                    </div>
+
+
+<!--                    <button type="submit" class="btn btn-primary">Upload File</button>-->
                 </form>
             </div>
 
