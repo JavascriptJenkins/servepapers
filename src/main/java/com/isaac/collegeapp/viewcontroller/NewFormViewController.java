@@ -2,21 +2,14 @@ package com.isaac.collegeapp.viewcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CharMatcher;
-import com.isaac.collegeapp.constants.StaticRoles;
 import com.isaac.collegeapp.email.EmailManager;
-import com.isaac.collegeapp.h2model.CancelTrainVO;
-import com.isaac.collegeapp.h2model.TokenVO;
 import com.isaac.collegeapp.jparepo.ProcessDataRepo;
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
 import com.isaac.collegeapp.jparepo.TokenRepo;
 import com.isaac.collegeapp.model.ProcessDataDAO;
-import com.isaac.collegeapp.model.SystemUserDAO;
 import com.isaac.collegeapp.modelnonpersist.FileVO;
-import com.isaac.collegeapp.security.Role;
-import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.NewFormService;
-import com.isaac.collegeapp.service.StudentService;
 import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,16 +29,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @RequestMapping("/newform")
 @Controller
 public class NewFormViewController {
-
-    @Autowired
-    StudentService studentService;
-
+    
 
     @Autowired
     UserService userService;

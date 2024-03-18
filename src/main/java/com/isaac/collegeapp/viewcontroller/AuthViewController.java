@@ -12,7 +12,6 @@ import com.isaac.collegeapp.security.JwtTokenProvider;
 import com.isaac.collegeapp.security.Role;
 import com.isaac.collegeapp.security.Token;
 import com.isaac.collegeapp.security.UserService;
-import com.isaac.collegeapp.service.StudentService;
 
 import com.isaac.collegeapp.util.SendgridEmailUtil;
 import com.isaac.collegeapp.util.TwilioTextUtil;
@@ -34,9 +33,6 @@ import java.util.*;
 @RequestMapping("/login")
 @Controller
 public class AuthViewController {
-
-    @Autowired
-    StudentService studentService;
 
 
     @Autowired

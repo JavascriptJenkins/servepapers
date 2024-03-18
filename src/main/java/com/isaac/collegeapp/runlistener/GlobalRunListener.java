@@ -1,8 +1,6 @@
 package com.isaac.collegeapp.runlistener;
 
 import com.isaac.collegeapp.jparepo.SystemUserRepo;
-import com.isaac.collegeapp.model.ProfessorDAO;
-import com.isaac.collegeapp.repo.ProfessorRepository;
 import com.isaac.collegeapp.util.SimpleCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -14,8 +12,6 @@ import java.util.List;
 @Component
 public class GlobalRunListener implements ApplicationListener<ApplicationReadyEvent> {
 
-    @Autowired
-    ProfessorRepository professorRepository;
 
     @Autowired
     SystemUserRepo systemUserRepo;
@@ -50,10 +46,4 @@ public class GlobalRunListener implements ApplicationListener<ApplicationReadyEv
 
     }
 
-    protected void getProfessors() {
-
-        System.out.println("getProfessors database method is happening");
-        List<ProfessorDAO> professorDAOList = professorRepository.getProfessorDAOList();
-        System.out.println(professorDAOList);
-    }
 }

@@ -10,7 +10,6 @@ import com.isaac.collegeapp.model.SystemUserDAO;
 
 import com.isaac.collegeapp.security.UserService;
 import com.isaac.collegeapp.service.NewFormService;
-import com.isaac.collegeapp.service.StudentService;
 import com.isaac.collegeapp.service.SystemAccountService;
 import com.isaac.collegeapp.util.TechvvsFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,6 @@ import java.security.SecureRandom;
 @RequestMapping("/customer")
 @RestController // returns json data, not views
 public class CustomerPipelineController {
-
-    @Autowired
-    StudentService studentService;
-
 
     @Autowired
     UserService userService;
