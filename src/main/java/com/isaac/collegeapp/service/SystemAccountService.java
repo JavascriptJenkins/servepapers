@@ -169,7 +169,7 @@ public class SystemAccountService {
 
                 sb.append("Thank you for inquiring for technical services at TechVVS.  We will contact you about your inquiry in the next 1-3 business days. ");
                 sb.append("https://techvvs.io");
-               // sb.append("Verify your new account at https://servepapers.techvvs.io/login/verify?customJwtParameter="+emailtoken);
+               // sb.append("Verify your new account at http://localhost:8080/login/verify?customJwtParameter="+emailtoken);
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "We have received your inquiry about TechVVS services");
             } catch (Exception ex){
@@ -194,7 +194,7 @@ public class SystemAccountService {
                 sb.append("Client project: "+systemUserDAO.getProject());
                 sb.append("<br>");
                 sb.append("https://techvvs.io");
-                // sb.append("Verify your new account at https://servepapers.techvvs.io/login/verify?customJwtParameter="+emailtoken);
+                // sb.append("Verify your new account at http://localhost:8080/login/verify?customJwtParameter="+emailtoken);
 
                 emailManager.generateAndSendEmail(sb.toString(), list, "New inquiry about TechVVS services");
             } catch (Exception ex){
