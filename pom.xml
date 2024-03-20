@@ -58,13 +58,6 @@
 			<version>2.5.4</version>
 		</dependency>
 
-
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.data</groupId>-->
-<!--			<artifactId>spring-data-jpa</artifactId>-->
-<!--			<version>2.4.0</version>-->
-<!--		</dependency>-->
-
 		<dependency>
 			<!-- JPA Data (Repositories, Entities, Hibernate, etc..) -->
 			<groupId>org.springframework.boot</groupId>
@@ -106,7 +99,6 @@
 			<version>2.14.1</version>
 		</dependency>
 
-
 		<!-- This is needed for using twilio and sending out sms messages -->
 		<dependency>
 			<groupId>com.twilio.sdk</groupId>
@@ -121,14 +113,6 @@
 			<version>4.10.1</version>
 		</dependency>
 
-
-
-		<!--		<dependency>-->
-<!--			<groupId>javax.mail</groupId>-->
-<!--			<artifactId>mail</artifactId>-->
-<!--			<version>1.4.7</version>-->
-<!--		</dependency>-->
-
 		<!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
 		<dependency>
 			<groupId>javax.mail</groupId>
@@ -136,13 +120,11 @@
 			<version>1.6.2</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
-
 
 		<!-- Java texting api -->
 		<!-- https://mvnrepository.com/artifact/com.textmagic.sdk/textmagic-java-sdk -->
@@ -166,7 +148,6 @@
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -187,18 +168,51 @@
 <!--			<version>2.5.5</version>-->
 <!--		</dependency>-->
 
-
-
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>3.0.15</version>
+			<type>pom</type>
+		</dependency>
+		<!--		<dependency>-->
+		<!--			<groupId>org.codehaus.groovy</groupId>-->
+		<!--			<artifactId>groovy-backports-compat23</artifactId>-->
+		<!--			<version>2.4.5</version>-->
+		<!--		</dependency>-->
+		<!-- https://mvnrepository.com/artifact/org.spockframework/spock-core -->
+		<dependency>
+			<groupId>org.spockframework</groupId>
+			<artifactId>spock-core</artifactId>
+			<version>2.4-M1-groovy-4.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-eclipse-batch</artifactId>
+			<version>3.0.17-02</version>
+		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>
 			<plugin>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>3.11.0</version><!-- 3.6.2 is the minimum -->
+			<configuration>
+				<compilerId>groovy-eclipse-compiler</compilerId>
+			</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-eclipse-compiler</artifactId>
+						<version>3.9.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
 			<!--			This will clean the database -->
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -242,9 +256,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
-
 
 			<!-- replace all hostname files when going to do prod build -->
 <!--			<plugin>-->

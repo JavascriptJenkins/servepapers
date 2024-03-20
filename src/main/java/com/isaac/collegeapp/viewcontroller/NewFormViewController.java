@@ -33,15 +33,6 @@ import java.util.Optional;
 @RequestMapping("/newform")
 @Controller
 public class NewFormViewController {
-    
-
-    @Autowired
-    UserService userService;
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     private final String UPLOAD_DIR = "./uploads/";
 
@@ -51,23 +42,10 @@ public class NewFormViewController {
     @Autowired
     TechvvsFileHelper techvvsFileHelper;
 
-
-    @Autowired
-    SystemUserRepo systemUserRepo;
-
     @Autowired
     ProcessDataRepo processDataRepo;
 
-    @Autowired
-    NewFormService newFormService;
-
-    @Autowired
-    TokenRepo tokenRepo;
-
     SecureRandom secureRandom = new SecureRandom();
-
-    @Autowired
-    EmailManager emailManager;
 
 
     //default home mapping
@@ -85,8 +63,6 @@ public class NewFormViewController {
             processDataDAOToBind.setFilenumber(secureRandom.nextInt(10000000));
         }
 
-
-
         model.addAttribute("disableupload","true"); // disable uploading a file until we actually have a record submitted successfully
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", processDataDAOToBind);
@@ -100,10 +76,6 @@ public class NewFormViewController {
                              @RequestParam("page") Optional<Integer> page,
                              @RequestParam("size") Optional<Integer> size ){
 
-
-
-
-
         // https://www.baeldung.com/spring-data-jpa-pagination-sorting
         //pagination
         int currentPage = page.orElse(0);
@@ -116,26 +88,21 @@ public class NewFormViewController {
         }
 
         Page<ProcessDataDAO> pageOfProcessData = processDataRepo.findAll(pageable);
-      //  Page<ProcessDataDAO> processDataDAOPage = newFormService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
-
 
         int totalPages = pageOfProcessData.getTotalPages();
 
         List<Integer> pageNumbers = new ArrayList<>();
 
         while(totalPages > 0){
-
             pageNumbers.add(totalPages);
             totalPages = totalPages - 1;
         }
-
 
         model.addAttribute("pageNumbers", pageNumbers);
         model.addAttribute("page", currentPage);
         model.addAttribute("size", pageOfProcessData.getTotalPages());
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", new ProcessDataDAO());
-       // model.addAttribute("processdatas", processDataDAOList);
         model.addAttribute("processdataPage", pageOfProcessData);
         return "browseforms.html";
     }
@@ -199,12 +166,10 @@ public class NewFormViewController {
             model.addAttribute("filelist", null);
         }
 
-
         model.addAttribute("customJwtParameter", customJwtParameter);
         model.addAttribute("processdata", results.get(0));
         return "editforms.html";
     }
-
 
     @PostMapping ("/editProcessData")
     String editProcessData(@ModelAttribute( "processdata" ) ProcessDataDAO processDataDAO,
@@ -219,7 +184,6 @@ public class NewFormViewController {
         System.out.println("authentication.getPrincipal: "+authentication.getPrincipal());
         System.out.println("authentication.getAuthorities: "+authentication.getAuthorities());
         System.out.println("----------------------- END AUTH INFO ");
-
 
         String errorResult = validateNewFormInfo(processDataDAO);
 
@@ -236,13 +200,6 @@ public class NewFormViewController {
             } else {
                 processDataDAO.setActioncounter1(1);
             }
-
-//            if(processDataDAO.getserveattempts() != null){
-//                processDataDAO.setserveattempts(processDataDAO.getserveattempts()+1);
-//            } else {
-//                processDataDAO.setserveattempts(1);
-//            }
-
 
             ProcessDataDAO result = processDataRepo.save(processDataDAO);
 
@@ -276,7 +233,6 @@ public class NewFormViewController {
         System.out.println("authentication.getAuthorities: "+authentication.getAuthorities());
         System.out.println("----------------------- END AUTH INFO ");
 
-
         String errorResult = validateNewFormInfo(processDataDAO);
 
         // Validation
@@ -296,29 +252,17 @@ public class NewFormViewController {
                 processDataDAO.setActioncounter1(1);
             }
 
-//            if(processDataDAO.getserveattempts() != null){
-//                processDataDAO.setserveattempts(processDataDAO.getserveattempts()+1);
-//            } else {
-//                processDataDAO.setserveattempts(1);
-//            }
-
-
             ProcessDataDAO result = processDataRepo.save(processDataDAO);
 
             model.addAttribute("successMessage","Record Successfully Saved. ");
             model.addAttribute("processdata", result);
-
         }
-
-
 
         model.addAttribute("customJwtParameter", customJwtParameter);
         return "newform.html";
     }
 
-
     String validateNewFormInfo(ProcessDataDAO processDataDAO){
-
 
         if(processDataDAO.getFname() != null &&
                 (processDataDAO.getFname().length() > 250
@@ -333,15 +277,6 @@ public class NewFormViewController {
         ){
             return "last name must be between 1-250 characters. ";
         }
-
-//        if(
-//                processDataDAO.getMname() != null &&
-//                (processDataDAO.getMname().length() > 250
-//                || processDataDAO.getMname().length() < 1)
-//        ){
-//            return "middle name must be between 1-250 characters. ";
-//        }
-
 
         // get all the integers out of the phone string (guava is faster than regex)
         if(processDataDAO.getPhone() != null){
@@ -421,8 +356,6 @@ public class NewFormViewController {
 
         return "success";
     }
-
-
 
 
 }
