@@ -86,7 +86,7 @@ class CreateNewAppUtil extends Specification{
 
         // producttypevo fields
         List<FieldVO> list2 = new ArrayList<>()
-        list.addAll(
+        list2.addAll(
                 new FieldVO(fieldName: "product_type_id", dataType: "Integer", jsonDataType: "number"),
                 new FieldVO(fieldName: "name", dataType: "String", jsonDataType: "string"),
                 new FieldVO(fieldName: "description", dataType: "String", jsonDataType: "string"),

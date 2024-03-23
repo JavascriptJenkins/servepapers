@@ -169,7 +169,7 @@ class ExecuteCreateNewAppTask implements Runnable {
         file.mkdir()//
 
         // Make main App class
-        file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/"+createAppVO.appName.toUpperCase()+"App.java")
+        file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/"+upperCase(createAppVO.appName)+"App.java")
         createMainClassFile(file)
 
         // make resources dir
@@ -225,6 +225,7 @@ class ExecuteCreateNewAppTask implements Runnable {
 
     void createAppPropertiesFile(File file){
         println("CREATING createAppPropertiesFile FILE!!!")
+        buildAppPropertiesFile()
         file.write payload.toString()
         payload.setLength(0) // clear the stringbuilder
     }
@@ -396,7 +397,8 @@ class ExecuteCreateNewAppTask implements Runnable {
     }
 
     void writeContentToChildCrudFile(CreateCrudVO createCrudVO){
-        jpaEntityBuilder.buildJpaEntity(createCrudVO, payload, createAppVO)
+       // jpaEntityBuilder.buildJpaEntity(createCrudVO, payload, createAppVO)
+        jpaEntityBuilder.buildChildJpaEntity(createCrudVO.crudTypeVO, payload, createAppVO)
     }
 
     void writeContentToJpaRepoFile(CreateCrudVO createCrudVO){
@@ -457,6 +459,8 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "}")
     }
 
+
+    /*todo: handle controller with a crud entity that has no child type*/
     void writeSingleCrudContentToController(CreateCrudVO createCrudVO){
         payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".controller\n" +
                 "\n" +
@@ -745,17 +749,17 @@ class ExecuteCreateNewAppTask implements Runnable {
 
     String hydrateMainClassFile(){
 
-        payload.append('package com.techvvs.'+createAppVO.appName+';\n' +
+        payload.append('package com.techvvs.'+createAppVO.appName.toLowerCase()+';\n' +
                 '\n' +
                 'import org.springframework.boot.SpringApplication;\n' +
                 'import org.springframework.boot.autoconfigure.SpringBootApplication;\n' +
                 '\n' +
                 '\n' +
                 '@SpringBootApplication\n' +
-                'public class '+createAppVO.appName.toUpperCase()+'Application {\n' +
+                'public class '+upperCase(createAppVO.appName)+'App {\n' +
                 '\n' +
                 '\tpublic static void main(String[] args) {\n' +
-                '\t\tSpringApplication.run('+createAppVO.appName.toUpperCase()+'Application.class, args);\n' +
+                '\t\tSpringApplication.run('+upperCase(createAppVO.appName)+'App.class, args);\n' +
                 '\t}\n' +
                 '\n' +
                 '}\n')
@@ -966,7 +970,7 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "\t\t<dependency>\n" +
                 "\t\t\t<groupId>org.codehaus.groovy</groupId>\n" +
                 "\t\t\t<artifactId>groovy-eclipse-batch</artifactId>\n" +
-                "\t\t\t<version>3.0.17-02</version>\n" +
+                "\t\t\t<version>3.0.8-01</version>\n" +
                 "\t\t</dependency>\n" +
                 "\t</dependencies>\n" +
                 "\t\n" +
@@ -984,6 +988,13 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "\t\t\t\t\t\t<artifactId>groovy-eclipse-compiler</artifactId>\n" +
                 "\t\t\t\t\t\t<version>3.9.0</version>\n" +
                 "\t\t\t\t\t</dependency>\n" +
+
+                "\t\t\t\t\t<dependency>\n" +
+                "\t\t\t\t\t\t<groupId>org.codehaus.groovy</groupId>\n" +
+                "\t\t\t\t\t\t<artifactId>groovy-eclipse-batch</artifactId>\n" +
+                "\t\t\t\t\t\t<version>3.0.8-01</version>\n" +
+                "\t\t\t\t\t</dependency>"+
+
                 "\t\t\t\t</dependencies>\n" +
                 "\t\t\t</plugin>\n" +
                 "\t\t\t<plugin>\n" +
@@ -1061,6 +1072,15 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "<!--\t\t\t</plugin>-->\n" +
                 "\t\t</plugins>\n" +
                 "\t</build>\n" +
+                "\t<pluginRepositories>\n" +
+                "\t\t<pluginRepository>\n" +
+                "\t\t\t<id>groovy-plugins-release</id>\n" +
+                "\t\t\t<url>https://groovy.jfrog.io/artifactory/plugins-release</url>\n" +
+                "\t\t</pluginRepository>\n" +
+                "\n" +
+                "\t</pluginRepositories>"+
+
+
                 "\n" +
                 "</project>\n")
 
@@ -1387,6 +1407,49 @@ class ExecuteCreateNewAppTask implements Runnable {
         }
 
         return sb.toString()
+    }
+
+    String buildAppPropertiesFile(){
+        payload.append("## techvvs application settings ##\n" +
+                "\n" +
+                "## dev1 will make it skip email activation\n" +
+                "## change to prod for deploying\n" +
+                "## envs are dev1,prod\n" +
+                "spring.profiles.active=\${ENVIRONMENT_NAME:prod}\n" +
+                "\n" +
+                "#server.servlet.context-path=/api\n" +
+                "spring.web.resources.static-locations=classpath:/static/\n" +
+                "\n" +
+                "logging.file.name=logs/sb-logs.log\n" +
+                "\n" +
+                "## Api keys\n" +
+                "twilio.api.username=\n" +
+                "twilio.api.password=\n" +
+                "sendgrid.api.key=\n" +
+                "\n" +
+                "spring.thymeleaf.cache=false\n" +
+                "spring.resources.add-mappings=true\n" +
+                "\n" +
+                "## To use a mysql database can use this setup\n" +
+                "#spring.datasource.url=jdbc:mysql://localhost:3306/collegeapp?useSSL=false\n" +
+                "#spring.datasource.username=root\n" +
+                "#spring.datasource.password=password\n" +
+                "\n" +
+                "## start h2 database settings\n" +
+                "## The database will be filled at startup with data from data.sql\n" +
+                "## spring.datasource.url defines the flatfile used to store our database data\n" +
+                "spring.datasource.url=jdbc:h2:file:./data/demo\n" +
+                "spring.datasource.driverClassName=org.h2.Driver\n" +
+                "spring.datasource.username=sa\n" +
+                "spring.datasource.password=\n" +
+                "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect\n" +
+                "spring.h2.console.enabled=true\n" +
+                "## below property will make sure spring picks up data.sql file\n" +
+                "spring.sql.init.mode=always\n" +
+                "spring.h2.console.settings.web-allow-others=true\n" +
+                "spring.jpa.hibernate.ddl-auto=create\n" +
+                "## end h2 database settings\n" +
+                "\n")
     }
 
 
