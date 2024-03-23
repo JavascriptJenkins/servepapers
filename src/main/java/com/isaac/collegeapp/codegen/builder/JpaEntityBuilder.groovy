@@ -48,7 +48,7 @@ class JpaEntityBuilder {
                 "@JsonIgnoreProperties\n" +
                 "@Entity\n" +
                 "@Table(name=\""+createCrudTypeVO.nameOfObject+"\")\n" +
-                "class "+upperCase(createCrudTypeVO.nameOfObject)+"VO implements Serializable {\n" +
+                "public class "+upperCase(createCrudTypeVO.nameOfObject)+"VO implements Serializable {\n" +
                 "\n")
 
         // loop thru unique new table fields
@@ -111,7 +111,7 @@ class JpaEntityBuilder {
                 "@JsonIgnoreProperties\n" +
                 "@Entity\n" +
                 "@Table(name=\""+createCrudVO.nameOfObject+"\")\n" +
-                "class "+upperCase(createCrudVO.nameOfObject)+"VO implements Serializable {\n" +
+                "public class "+upperCase(createCrudVO.nameOfObject)+"VO implements Serializable {\n" +
                 "\n")
 
         // loop thru unique new table fields

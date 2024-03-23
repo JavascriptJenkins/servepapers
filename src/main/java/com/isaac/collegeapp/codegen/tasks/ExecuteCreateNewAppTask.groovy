@@ -107,6 +107,7 @@ class ExecuteCreateNewAppTask implements Runnable {
             if(createCrudVO.crudTypeVO != null){
                 createCrudChildObject(createCrudVO)
                 createControllerWithChildType(createCrudVO)
+                createChildJpaRepo(createCrudVO)
             } else {
                 createController(createCrudVO)
             }
@@ -279,6 +280,14 @@ class ExecuteCreateNewAppTask implements Runnable {
         payload.setLength(0) // clear the stringbuilder
     }
 
+    void createChildJpaRepo(CreateCrudVO createCrudVO){
+        File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/jparepo/"+createCrudVO.crudTypeVO.nameOfObject+"Repo.java")
+        println("CREATING createChildJpaRepo FILE!!!")
+        writeContentToChildJpaRepoFile(createCrudVO)
+        file.write payload.toString()
+        payload.setLength(0) // clear the stringbuilder
+    }
+
     void createController(CreateCrudVO createCrudVO){
         File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/viewcontroller/"+upperCase(createCrudVO.nameOfObject)+"Controller.groovy")
         println("CREATING createController FILE!!!")
@@ -401,16 +410,29 @@ class ExecuteCreateNewAppTask implements Runnable {
         jpaEntityBuilder.buildChildJpaEntity(createCrudVO.crudTypeVO, payload, createAppVO)
     }
 
-    void writeContentToJpaRepoFile(CreateCrudVO createCrudVO){
+    void writeContentToChildJpaRepoFile(CreateCrudVO createCrudVO){
         payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".jparepo;\n" +
                 "\n" +
-                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"VO;\n" +
-                "import jakarta.transaction.Transactional;\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.crudTypeVO.nameOfObject)+"VO;\n" +
                 "import org.springframework.data.jpa.repository.JpaRepository;\n" +
                 "\n" +
                 "import java.util.List;\n" +
                 "\n" +
-                "public interface "+createCrudVO.nameOfObject+"Repository extends JpaRepository<"+createCrudVO.nameOfObject+"VO, Integer> {\n" +
+                "public interface "+createCrudVO.crudTypeVO.nameOfObject+"Repo extends JpaRepository<"+createCrudVO.crudTypeVO.nameOfObject+"VO, Integer> {\n" +
+                "\n" +
+                "    List<"+createCrudVO.crudTypeVO.nameOfObject+"VO> findAll();\n" +
+                "\n" +
+                "}")
+    }
+    void writeContentToJpaRepoFile(CreateCrudVO createCrudVO){
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".jparepo;\n" +
+                "\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"VO;\n" +
+                "import org.springframework.data.jpa.repository.JpaRepository;\n" +
+                "\n" +
+                "import java.util.List;\n" +
+                "\n" +
+                "public interface "+createCrudVO.nameOfObject+"Repo extends JpaRepository<"+createCrudVO.nameOfObject+"VO, Integer> {\n" +
                 "\n" +
                 "    List<"+createCrudVO.nameOfObject+"VO> findAll();\n" +
                 "\n" +
@@ -552,13 +574,13 @@ class ExecuteCreateNewAppTask implements Runnable {
 
 
     void writeCrudWithCildTypeContentToController(CreateCrudVO createCrudVO){
-        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".controller\n" +
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".viewcontroller\n" +
                 "\n" +
-                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"\n" +
-                "import com.techvvs."+createAppVO.appName.toLowerCase()+".repository."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repository\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"VO"+"\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".jparepo."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repo\n" +
                 "import com.fasterxml.jackson.databind.JsonNode\n" +
                 "import com.fasterxml.jackson.databind.ObjectMapper\n" +
-                "import com.techvvs."+createAppVO.appName.toLowerCase()+".repository."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"TypeRepository\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".jparepo."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"TypeRepo\n" +
                 "import org.slf4j.Logger\n" +
                 "import org.slf4j.LoggerFactory\n" +
                 "import org.springframework.beans.factory.annotation.Autowired\n" +
@@ -573,10 +595,10 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "class "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Controller {\n" +
                 "\n" +
                 "    @Autowired\n" +
-                "    "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repository "+createCrudVO.nameOfObject.toLowerCase()+"Repository\n" +
+                "    "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repo "+createCrudVO.nameOfObject.toLowerCase()+"TypeRepository\n" +
                 "\n" +
                 "    @Autowired\n" +
-                "    "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"TypeRepository "+createCrudVO.nameOfObject.toLowerCase()+"TypeRepository\n" +
+                "    "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"TypeRepo "+createCrudVO.nameOfObject.toLowerCase()+"TypeRepository\n" +
                 "\n" +
                 "    ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();;\n" +
                 "\n" +
@@ -1168,7 +1190,6 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "import org.springframework.data.jpa.repository.JpaRepository;\n" +
                 "import java.util.List;\n"+
                 "\n" +
-                "import jakarta.transaction.Transactional\n" +
                 "\n" +
                 "public interface "+upperCase(createCrudVO.nameOfObject)+"Repository extends JpaRepository<"+upperCase(createCrudVO.nameOfObject)+"VO, Integer> {\n" +
                 "\n" +
