@@ -100,6 +100,8 @@ class ExecuteCreateNewAppTask implements Runnable {
         for(CreateCrudVO createCrudVO :createCrudVOList){
 
             createCrudObject(createCrudVO)
+            createJpaRepo(createCrudVO)
+
             if(createCrudVO.crudTypeVO != null){
                 createCrudChildObject(createCrudVO)
             }
@@ -263,6 +265,14 @@ class ExecuteCreateNewAppTask implements Runnable {
         payload.setLength(0) // clear the stringbuilder
     }
 
+    void createJpaRepo(CreateCrudVO createCrudVO){
+        File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/jparepo/"+createCrudVO.nameOfObject+"Repo.java")
+        println("CREATING createJpaRepo FILE!!!")
+        writeContentToJpaRepoFile(createCrudVO)
+        file.write payload.toString()
+        payload.setLength(0) // clear the stringbuilder
+    }
+
 
 
     void createHtmlFile(){
@@ -346,6 +356,23 @@ class ExecuteCreateNewAppTask implements Runnable {
     void writeContentToChildCrudFile(CreateCrudVO createCrudVO){
         jpaEntityBuilder.buildJpaEntity(createCrudVO, payload, createAppVO)
     }
+
+    void writeContentToJpaRepoFile(CreateCrudVO createCrudVO){
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".jparepo;\n" +
+                "\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"VO;\n" +
+                "import jakarta.transaction.Transactional;\n" +
+                "import org.springframework.data.jpa.repository.JpaRepository;\n" +
+                "\n" +
+                "import java.util.List;\n" +
+                "\n" +
+                "public interface "+createCrudVO.nameOfObject+"Repository extends JpaRepository<"+createCrudVO.nameOfObject+"VO, Integer> {\n" +
+                "\n" +
+                "    List<"+createCrudVO.nameOfObject+"VO> findAll();\n" +
+                "\n" +
+                "}")
+    }
+
 
 
     void createTsParentChildTypeHtmlPages(){

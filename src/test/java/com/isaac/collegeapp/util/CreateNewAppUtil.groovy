@@ -32,6 +32,34 @@ class CreateNewAppUtil extends Specification{
         CreateAppVO createAppVO = new CreateAppVO()
         createAppVO.setAppName("inventory") // com.techvvs.appname
 
+        List crudObjects = new ArrayList()
+
+        // This will hydrate a list of crudObjects which will be used for all other code generation for the app
+        crudObjects = hydrateCrudObjectList(crudObjects)
+
+
+
+
+
+
+        // All the actual code is made here
+        ExecuteCreateNewAppTask executeCreateNewAppTask =
+                new ExecuteCreateNewAppTask(createAppVO: createAppVO, createCrudVOList: crudObjects, jpaEntityBuilder: new JpaEntityBuilder())
+
+//        when:
+//        threadPoolTaskScheduler.schedule(
+//                executeCreateNewAppTask,
+//                new Date())
+        when:
+        executeCreateNewAppTask.run()
+
+        then:
+        0 * _._
+
+    }
+
+
+    List hydrateCrudObjectList(List crudObjects){
         // first make a list of fields for parent object
         List<FieldVO> list = new ArrayList<>()
         list.addAll(
@@ -74,25 +102,11 @@ class CreateNewAppUtil extends Specification{
 
 
         // * add the parent level vo's to the list * //
-        List createCrudObjects = new ArrayList()
-        createCrudObjects.add(createProductCrudVO1) // only have to add the parent object
 
+        crudObjects.add(createProductCrudVO1) // only have to add the parent object
 
-        ExecuteCreateNewAppTask executeCreateNewAppTask =
-                new ExecuteCreateNewAppTask(createAppVO: createAppVO, createCrudVOList: createCrudObjects, jpaEntityBuilder: new JpaEntityBuilder())
-
-//        when:
-//        threadPoolTaskScheduler.schedule(
-//                executeCreateNewAppTask,
-//                new Date())
-        when:
-        executeCreateNewAppTask.run()
-
-        then:
-        0 * _._
-
+        return crudObjects
     }
-
 
 //    def "Generate Product table"(){
 //
