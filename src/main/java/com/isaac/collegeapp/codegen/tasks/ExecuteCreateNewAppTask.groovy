@@ -55,6 +55,8 @@ class ExecuteCreateNewAppTask implements Runnable {
 
                      createNewAppStructure()
                      createModelFiles()
+                     createSimpleCache()
+                     createRunlistener()
                  }
 
 
@@ -104,6 +106,9 @@ class ExecuteCreateNewAppTask implements Runnable {
 
             if(createCrudVO.crudTypeVO != null){
                 createCrudChildObject(createCrudVO)
+                createControllerWithChildType(createCrudVO)
+            } else {
+                createController(createCrudVO)
             }
 
         }
@@ -273,6 +278,43 @@ class ExecuteCreateNewAppTask implements Runnable {
         payload.setLength(0) // clear the stringbuilder
     }
 
+    void createController(CreateCrudVO createCrudVO){
+        File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/viewcontroller/"+upperCase(createCrudVO.nameOfObject)+"Controller.groovy")
+        println("CREATING createController FILE!!!")
+        writeSingleCrudContentToController(createCrudVO)
+        file.write payload.toString()
+        payload.setLength(0) // clear the stringbuilder
+    }
+
+    void createControllerWithChildType(CreateCrudVO createCrudVO){
+        File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/viewcontroller/"+upperCase(createCrudVO.nameOfObject)+"Controller.groovy")
+        println("CREATING createControllerWithChildType FILE!!!")
+        writeCrudWithCildTypeContentToController(createCrudVO)
+        file.write payload.toString()
+        payload.setLength(0) // clear the stringbuilder
+    }
+
+
+
+    void createRunlistener(){
+        File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/runlistener/GlobalRunListener.java")
+        println("CREATING createRunlistener FILE!!!")
+        writeContentToRunListener()
+        file.write payload.toString()
+        payload.setLength(0) // clear the stringbuilder
+    }
+
+    void createSimpleCache(){
+        File file = new File("./codegen/"+createAppVO.appName+"/"+"src/main/java/com/techvvs/"+createAppVO.appName+"/util/SimpleCache.java")
+        println("CREATING createSimpleCache FILE!!!")
+        writeContentToSimpleCache()
+        file.write payload.toString()
+        payload.setLength(0) // clear the stringbuilder
+    }
+
+
+
+
 
 
     void createHtmlFile(){
@@ -372,6 +414,228 @@ class ExecuteCreateNewAppTask implements Runnable {
                 "\n" +
                 "}")
     }
+
+    void writeContentToRunListener(){
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".runlistener;\n" +
+                "\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".util.SimpleCache;\n" +
+                "import org.springframework.beans.factory.annotation.Autowired;\n" +
+                "import org.springframework.boot.context.event.ApplicationReadyEvent;\n" +
+                "import org.springframework.context.ApplicationListener;\n" +
+                "import org.springframework.stereotype.Component;\n" +
+                "\n" +
+                "@Component\n" +
+                "public class GlobalRunListener implements ApplicationListener<ApplicationReadyEvent> {\n" +
+                "\n" +
+                "    @Autowired\n" +
+                "    SimpleCache simpleCache;\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {\n" +
+                "        System.out.println(\"----- TechVVS Application has started ----\");\n" +
+                "        System.out.println(\"------- TechVVS Custom Cache Init ------\");\n" +
+                "\n" +
+                "        simpleCache.refreshCache();\n" +
+                "    }\n" +
+                "\n" +
+                "}\n")
+    }
+
+    void writeContentToSimpleCache(){
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".util;\n" +
+                "\n" +
+                "import org.springframework.stereotype.Component;\n" +
+                "\n" +
+                "// cache to get all user data by passing in a user object\n" +
+                "@Component\n" +
+                "public class SimpleCache {\n" +
+                "    \n" +
+                "    // making a cache of the users and their roles so we don't have to go to database every time\n" +
+                "    public void refreshCache(){\n" +
+                "    }\n" +
+                "\n" +
+                "}")
+    }
+
+    void writeSingleCrudContentToController(CreateCrudVO createCrudVO){
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".controller\n" +
+                "\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".repository."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repository\n" +
+                "import com.fasterxml.jackson.databind.JsonNode\n" +
+                "import com.fasterxml.jackson.databind.ObjectMapper\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".repository.ProductTypeRepository\n" +
+                "import org.slf4j.Logger\n" +
+                "import org.slf4j.LoggerFactory\n" +
+                "import org.springframework.beans.factory.annotation.Autowired\n" +
+                "import org.springframework.web.bind.annotation.GetMapping\n" +
+                "import org.springframework.web.bind.annotation.PostMapping\n" +
+                "import org.springframework.web.bind.annotation.RequestBody\n" +
+                "import org.springframework.web.bind.annotation.RequestMapping\n" +
+                "import org.springframework.web.bind.annotation.RestController\n" +
+                "\n" +
+                "@RestController\n" +
+                "@RequestMapping(\"/product\")\n" +
+                "class ProductController {\n" +
+                "\n" +
+                "    @Autowired\n" +
+                "    ProductRepository productRepository\n" +
+                "\n" +
+                "    @Autowired\n" +
+                "    ProductTypeRepository productTypeRepository\n" +
+                "\n" +
+                "    ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();;\n" +
+                "\n" +
+                "\n" +
+                "    private final Logger logger = LoggerFactory.getLogger(this.getClass())\n" +
+                "\n" +
+                "\n" +
+                "    @GetMapping(\"/getAll\")\n" +
+                "    String getAll() {\n" +
+                "\n" +
+                "        logger.info(\"ProductController.getAll HIT!!!\")\n" +
+                "        String payload = executeGetAll()\n" +
+                "        return payload\n" +
+                "    }\n" +
+                "\n" +
+                "    String executeGetAll(){\n" +
+                "        return mapper.writeValueAsString(productRepository.findAll())\n" +
+                "    }\n" +
+                "\n" +
+                "    @GetMapping(\"/getAllProductTypes\")\n" +
+                "    String getAllProductTypes() {\n" +
+                "\n" +
+                "        logger.info(\"ProductController.getAllProductTypes HIT!!!\")\n" +
+                "        String payload = executeGetAllProductTypes()\n" +
+                "        return payload\n" +
+                "    }\n" +
+                "\n" +
+                "    String executeGetAllProductTypes(){\n" +
+                "        return mapper.writeValueAsString(productTypeRepository.findAll())\n" +
+                "    }\n" +
+                "\n" +
+                "    @PostMapping(\"/edit\")\n" +
+                "    String edit(@RequestBody String json) {\n" +
+                "\n" +
+                "        logger.info(\"ProductController.edit HIT!!!\")\n" +
+                "\n" +
+                "        logger.info(\"json: \",json.toString())\n" +
+                "\n" +
+                "        JsonNode root = mapper.readTree(json);\n" +
+                "        ProductVO productVO = mapper.treeToValue(root, ProductVO.class)\n" +
+                "\n" +
+                "        String payload = executeEdit(productVO)\n" +
+                "\n" +
+                "        return payload\n" +
+                "    }\n" +
+                "\n" +
+                "    String executeEdit(ProductVO productVO){\n" +
+                "        // for creates\n" +
+                "        if(productVO.createTimeStamp == null && productVO.updateTimeStamp == null){\n" +
+                "            productVO.setUpdateTimeStamp(new Date())\n" +
+                "            productVO.setCreateTimeStamp(new Date())\n" +
+                "        }\n" +
+                "        // for updates\n" +
+                "        if(productVO.createTimeStamp == productVO.updateTimeStamp || productVO.updateTimeStamp > productVO.createTimeStamp){\n" +
+                "            productVO.setUpdateTimeStamp(new Date())\n" +
+                "        }\n" +
+                "        return mapper.writeValueAsString(productRepository.save(productVO))\n" +
+                "    }\n" +
+                "    \n" +
+                "\n" +
+                "}")
+    }
+
+
+    void writeCrudWithCildTypeContentToController(CreateCrudVO createCrudVO){
+        payload.append("package com.techvvs."+createAppVO.appName.toLowerCase()+".controller\n" +
+                "\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".model."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".repository."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repository\n" +
+                "import com.fasterxml.jackson.databind.JsonNode\n" +
+                "import com.fasterxml.jackson.databind.ObjectMapper\n" +
+                "import com.techvvs."+createAppVO.appName.toLowerCase()+".repository."+upperCase(createCrudVO.nameOfObject.toLowerCase())+"TypeRepository\n" +
+                "import org.slf4j.Logger\n" +
+                "import org.slf4j.LoggerFactory\n" +
+                "import org.springframework.beans.factory.annotation.Autowired\n" +
+                "import org.springframework.web.bind.annotation.GetMapping\n" +
+                "import org.springframework.web.bind.annotation.PostMapping\n" +
+                "import org.springframework.web.bind.annotation.RequestBody\n" +
+                "import org.springframework.web.bind.annotation.RequestMapping\n" +
+                "import org.springframework.web.bind.annotation.RestController\n" +
+                "\n" +
+                "@RestController\n" +
+                "@RequestMapping(\"/"+createCrudVO.nameOfObject.toLowerCase()+"\")\n" +
+                "class "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Controller {\n" +
+                "\n" +
+                "    @Autowired\n" +
+                "    "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Repository "+createCrudVO.nameOfObject.toLowerCase()+"Repository\n" +
+                "\n" +
+                "    @Autowired\n" +
+                "    "+upperCase(createCrudVO.nameOfObject.toLowerCase())+"TypeRepository "+createCrudVO.nameOfObject.toLowerCase()+"TypeRepository\n" +
+                "\n" +
+                "    ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();;\n" +
+                "\n" +
+                "\n" +
+                "    private final Logger logger = LoggerFactory.getLogger(this.getClass())\n" +
+                "\n" +
+                "\n" +
+                "    @GetMapping(\"/getAll\")\n" +
+                "    String getAll() {\n" +
+                "\n" +
+                "        logger.info(\""+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Controller.getAll HIT!!!\")\n" +
+                "        String payload = executeGetAll()\n" +
+                "        return payload\n" +
+                "    }\n" +
+                "\n" +
+                "    String executeGetAll(){\n" +
+                "        return mapper.writeValueAsString("+createCrudVO.nameOfObject.toLowerCase()+"Repository.findAll())\n" +
+                "    }\n" +
+                "\n" +
+                "    @GetMapping(\"/getAll"+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Types\")\n" +
+                "    String getAll"+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Types() {\n" +
+                "\n" +
+                "        logger.info(\""+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Controller.getAll"+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Types HIT!!!\")\n" +
+                "        String payload = executeGetAll"+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Types()\n" +
+                "        return payload\n" +
+                "    }\n" +
+                "\n" +
+                "    String executeGetAll"+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Types(){\n" +
+                "        return mapper.writeValueAsString("+createCrudVO.nameOfObject.toLowerCase()+"TypeRepository.findAll())\n" +
+                "    }\n" +
+                "\n" +
+                "    @PostMapping(\"/edit\")\n" +
+                "    String edit(@RequestBody String json) {\n" +
+                "\n" +
+                "        logger.info(\""+upperCase(createCrudVO.nameOfObject.toLowerCase())+"Controller.edit HIT!!!\")\n" +
+                "\n" +
+                "        logger.info(\"json: \",json.toString())\n" +
+                "\n" +
+                "        JsonNode root = mapper.readTree(json);\n" +
+                "        ProductVO "+createCrudVO.nameOfObject.toLowerCase()+"VO = mapper.treeToValue(root, ProductVO.class)\n" +
+                "\n" +
+                "        String payload = executeEdit("+createCrudVO.nameOfObject.toLowerCase()+"VO)\n" +
+                "\n" +
+                "        return payload\n" +
+                "    }\n" +
+                "\n" +
+                "    String executeEdit("+upperCase(createCrudVO.nameOfObject.toLowerCase())+"VO "+createCrudVO.nameOfObject.toLowerCase()+"VO){\n" +
+                "        // for creates\n" +
+                "        if("+createCrudVO.nameOfObject.toLowerCase()+"VO.createTimeStamp == null && "+createCrudVO.nameOfObject.toLowerCase()+"VO.updateTimeStamp == null){\n" +
+                "            "+createCrudVO.nameOfObject.toLowerCase()+"VO.setUpdateTimeStamp(new Date())\n" +
+                "            "+createCrudVO.nameOfObject.toLowerCase()+"VO.setCreateTimeStamp(new Date())\n" +
+                "        }\n" +
+                "        // for updates\n" +
+                "        if("+createCrudVO.nameOfObject.toLowerCase()+"VO.createTimeStamp == "+createCrudVO.nameOfObject.toLowerCase()+"VO.updateTimeStamp || "+createCrudVO.nameOfObject.toLowerCase()+"VO.updateTimeStamp > "+createCrudVO.nameOfObject.toLowerCase()+"VO.createTimeStamp){\n" +
+                "            "+createCrudVO.nameOfObject.toLowerCase()+"VO.setUpdateTimeStamp(new Date())\n" +
+                "        }\n" +
+                "        return mapper.writeValueAsString("+createCrudVO.nameOfObject.toLowerCase()+"Repository.save("+createCrudVO.nameOfObject.toLowerCase()+"VO))\n" +
+                "    }\n" +
+                "    \n" +
+                "\n" +
+                "}")
+    }
+
 
 
 
